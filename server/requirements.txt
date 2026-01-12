@@ -1,0 +1,10 @@
+flask
+flask-cors
+
+flask-sqlalchemy
+psycopg2-binary
+transformers
+torch
+numpy
+pandas
+gunicorn
