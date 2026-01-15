@@ -14,7 +14,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 from routes.health_routes import health_bp
 # TEST CONNECTION
 from routes.test_db_routes import test_db_bp
-<<<<<<< HEAD
 
 # ARTIFICIAL INTELLIGENCE
 from routes.ai.ai_routes import ai_bp
@@ -26,12 +25,7 @@ app.register_blueprint(health_bp,  url_prefix="/api")
 app.register_blueprint(test_db_bp, url_prefix="/api")
 app.register_blueprint(ai_bp, url_prefix="/api")
 app.register_blueprint(survey_bp, url_prefix="/api")
-=======
 
-app.register_blueprint(health_bp,  url_prefix="/api")
-app.register_blueprint(test_db_bp, url_prefix="/api")
-
->>>>>>> 7b0f88ec612345201336620bfa78e0e9f805928b
 # -------------------------------------------------
 # Entry Point
 # -------------------------------------------------
