@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from model.run_tests import run_model_tests
 from controllers.run_tests import run_controller_tests
+from services.run_tests import run_services_tests
 # -------------------------------------------------
 # Flask Initialization
 # -------------------------------------------------
@@ -31,4 +32,5 @@ app.register_blueprint(survey_bp, url_prefix="/api")
 if __name__ == "__main__":
     run_model_tests()
     run_controller_tests()
+    run_services_tests()
     app.run(debug=True)
