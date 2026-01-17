@@ -1,21 +1,11 @@
 from ai.bert_model import predict_sentiment
 
-def compute_sentiment_score(percentages):
-    positive = percentages.get("Positive", 0)
-    negative = percentages.get("Negative", 0)
-
-    sentiment_score = round((positive - negative) / 100, 2)
-
-    return sentiment_score
-
-
 def analyze_sentiment(comments):
     if not comments:
         return {
-            "status": "no_text_feedback",
+            "total": 0,
             "counts": {},
-            "percentages": {},
-            "dominant_sentiment": None
+            "percentages": {}
         }
 
     counts = {
@@ -24,24 +14,26 @@ def analyze_sentiment(comments):
         "Negative": 0
     }
 
-    # Count sentiments
+    total_confidence = 0
+    total = len(comments)
+
     for text in comments:
-        sentiment = predict_sentiment(text)
-        counts[sentiment] += 1
+        result = predict_sentiment(text)
 
-    total = sum(counts.values())
+        label = result["label"]
+        confidence = result["confidence"]
 
-    # Calculate percentages
+        counts[label] += 1
+        total_confidence += confidence
+
     percentages = {
         k: round((v / total) * 100, 2)
         for k, v in counts.items()
     }
-    sentiment_score = compute_sentiment_score(percentages)
-    dominant = max(counts, key=counts.get)
 
     return {
+        "total": total,
         "counts": counts,
         "percentages": percentages,
-        "sentiment_score": sentiment_score,
-        "dominant_sentiment": dominant
+        "average_confidence": round(total_confidence / total, 2)
     }
