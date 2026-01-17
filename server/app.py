@@ -26,6 +26,9 @@ app.register_blueprint(health_bp,  url_prefix="/api")
 app.register_blueprint(test_db_bp, url_prefix="/api")
 app.register_blueprint(survey_bp, url_prefix="/api")
 # -------------------------------------------------
+@app.route("/")
+def home():
+    return "Server is running"
 # -------------------------------------------------
 # Entry Point
 # -------------------------------------------------
