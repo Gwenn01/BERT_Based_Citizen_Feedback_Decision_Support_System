@@ -29,4 +29,6 @@ app.register_blueprint(survey_bp, url_prefix="/api")
 # Entry Point
 # -------------------------------------------------
 if __name__ == "__main__":
+    run_model_tests()
+    run_controller_tests()
     app.run(debug=True)
