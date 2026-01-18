@@ -1,37 +1,56 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
+import requests
+import os
 
-#MODEL_NAME = "nlptown/bert-base-multilingual-uncased-sentiment"
-MODEL_NAME = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+API_URL = "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+if not HF_TOKEN:
+    raise RuntimeError("HF_TOKEN is not set. Please set environment variable.")
+
+HEADERS = {
+    "Authorization": f"Bearer {HF_TOKEN}"
+}
+
+LABEL_MAP = {
+    "LABEL_0": "Negative",
+    "LABEL_1": "Neutral",
+    "LABEL_2": "Positive"
+}
 
 def predict_sentiment(text):
-    inputs = tokenizer(
-        text,
-        return_tensors="pt",
-        truncation=True,
-        padding=True,
-        max_length=128
+    response = requests.post(
+        API_URL,
+        headers=HEADERS,
+        json={"inputs": text},
+        timeout=10
     )
 
-    with torch.no_grad():
-        outputs = model(**inputs)
+    data = response.json()
 
-    scores = torch.softmax(outputs.logits, dim=1)[0]
-    stars = torch.argmax(scores).item() + 1
-    confidence = float(scores[stars - 1])
+    # Handle API errors safely
+    if isinstance(data, dict) and "error" in data:
+        return {
+            "label": "Neutral",
+            "confidence": 0.0
+        }
 
-    if stars <= 2:
-        label = "Negative"
-    elif stars == 3:
-        label = "Neutral"
-    else:
-        label = "Positive"
+    predictions = data[0]
+    best = max(predictions, key=lambda x: x["score"])
+
+    # Normalize labels from HF model
+    label_map = {
+        "LABEL_0": "Negative",
+        "LABEL_1": "Neutral",
+        "LABEL_2": "Positive",
+        "negative": "Negative",
+        "neutral": "Neutral",
+        "positive": "Positive"
+    }
+
+    label = label_map.get(best["label"], "Neutral")
 
     return {
         "label": label,
-        "stars": stars,
-        "confidence": confidence
+        "confidence": round(best["score"], 4)
     }
+

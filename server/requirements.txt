@@ -4,5 +4,7 @@ torch
 transformers
 scikit-learn
 protobuf==3.20.3
+python-dotenv
+
 
 

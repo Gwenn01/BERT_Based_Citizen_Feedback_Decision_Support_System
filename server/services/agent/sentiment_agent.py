@@ -5,7 +5,8 @@ def analyze_sentiment(comments):
         return {
             "total": 0,
             "counts": {},
-            "percentages": {}
+            "percentages": {},
+            "average_confidence": 0
         }
 
     counts = {
@@ -15,25 +16,30 @@ def analyze_sentiment(comments):
     }
 
     total_confidence = 0
-    total = len(comments)
+    valid = 0
 
     for text in comments:
         result = predict_sentiment(text)
 
-        label = result["label"]
-        confidence = result["confidence"]
+        label = result.get("label", "Neutral")
+        confidence = result.get("confidence", 0)
+
+        if label not in counts:
+            label = "Neutral"
 
         counts[label] += 1
         total_confidence += confidence
+        valid += 1
 
     percentages = {
-        k: round((v / total) * 100, 2)
+        k: round((v / valid) * 100, 2) if valid else 0
         for k, v in counts.items()
     }
 
     return {
-        "total": total,
+        "total": valid,
         "counts": counts,
         "percentages": percentages,
-        "average_confidence": round(total_confidence / total, 2)
+        "average_confidence": round(total_confidence / valid, 2) if valid else 0
     }
+
