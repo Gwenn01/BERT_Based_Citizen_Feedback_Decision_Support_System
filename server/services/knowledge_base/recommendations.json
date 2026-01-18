@@ -1,0 +1,34 @@
+{
+  "responsiveness": {
+    "issue": "Slow response to citizen requests",
+    "solutions": [
+      "Implement response time standards",
+      "Use ticket-based service tracking",
+      "Train frontline staff on customer handling"
+    ]
+  },
+  "facilities": {
+    "issue": "Inadequate service facilities",
+    "solutions": [
+      "Improve waiting area conditions",
+      "Ensure accessibility for PWDs",
+      "Upgrade service equipment"
+    ]
+  },
+  "Overall Service Experience": {
+    "issue": "High public dissatisfaction",
+    "solutions": [
+      "Analyze complaint themes",
+      "Conduct service quality training",
+      "Create a service improvement task force"
+    ]
+  },
+  "Citizen Charter Awareness": {
+    "issue": "Low awareness of Citizen’s Charter",
+    "solutions": [
+      "Post Citizen Charter in visible locations",
+      "Distribute brochures",
+      "Use social media and website announcements"
+    ]
+  }
+}
