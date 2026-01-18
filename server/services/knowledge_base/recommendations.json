@@ -1,34 +1,152 @@
 {
-  "responsiveness": {
-    "issue": "Slow response to citizen requests",
-    "solutions": [
-      "Implement response time standards",
-      "Use ticket-based service tracking",
-      "Train frontline staff on customer handling"
-    ]
+  "metadata": {
+    "type": "service_quality_knowledge_base",
+    "version": "1.0",
+    "description": "Expert knowledge base for interpreting citizen feedback, service quality dimensions, and generating improvement recommendations. Designed to be combined with survey scores and sentiment analysis results."
   },
-  "facilities": {
-    "issue": "Inadequate service facilities",
-    "solutions": [
-      "Improve waiting area conditions",
-      "Ensure accessibility for PWDs",
-      "Upgrade service equipment"
-    ]
+
+  "dimensions": {
+    "responsiveness": {
+      "category": "Service Quality",
+      "issue": "Slow response to citizen requests and inquiries",
+      "root_cause": "Lack of response time standards, monitoring, and workload prioritization",
+      "impact": "Delays frustrate citizens and reduce trust in government efficiency",
+      "solutions": [
+        "Set clear response time standards for all services",
+        "Use a ticket-based system to track citizen requests",
+        "Assign staff responsible for monitoring pending requests",
+        "Train frontline staff to prioritize urgent concerns"
+      ]
+    },
+
+    "reliability": {
+      "category": "Service Quality",
+      "issue": "Inconsistent delivery of promised services",
+      "root_cause": "Absence of standardized procedures and performance monitoring",
+      "impact": "Citizens lose confidence when services are delayed, incomplete, or incorrect",
+      "solutions": [
+        "Standardize service procedures across all transactions",
+        "Create service checklists to avoid missed steps",
+        "Monitor service completion rates regularly",
+        "Hold staff accountable for service delays or errors"
+      ]
+    },
+
+    "facilities": {
+      "category": "Service Quality",
+      "issue": "Inadequate and uncomfortable service facilities",
+      "root_cause": "Limited maintenance, outdated equipment, and poor facility planning",
+      "impact": "Uncomfortable environments negatively affect citizen satisfaction and accessibility",
+      "solutions": [
+        "Improve cleanliness and seating in waiting areas",
+        "Ensure facilities are accessible to PWDs and senior citizens",
+        "Upgrade service counters and equipment",
+        "Improve signage to guide citizens easily"
+      ]
+    },
+
+    "communication": {
+      "category": "Service Quality",
+      "issue": "Unclear or insufficient communication with citizens",
+      "root_cause": "Lack of clear information channels and staff communication skills",
+      "impact": "Citizens become confused, make errors, and feel poorly assisted",
+      "solutions": [
+        "Provide clear service instructions at service counters",
+        "Train staff to communicate politely and clearly",
+        "Use posters and digital screens for service information",
+        "Ensure citizens understand service steps before processing"
+      ]
+    },
+
+    "costs": {
+      "category": "Service Quality",
+      "issue": "Perceived high or unclear service costs",
+      "root_cause": "Poor transparency in fees and inconsistent explanation of charges",
+      "impact": "Citizens may suspect unfair practices or corruption",
+      "solutions": [
+        "Display official service fees clearly in visible areas",
+        "Ensure staff explain costs before processing transactions",
+        "Prevent unauthorized or unofficial charges",
+        "Regularly review fees to ensure fairness"
+      ]
+    },
+
+    "integrity": {
+      "category": "Governance & Ethics",
+      "issue": "Lack of trust in service fairness and honesty",
+      "root_cause": "Weak enforcement of ethical standards and complaint mechanisms",
+      "impact": "Erodes public trust and damages institutional credibility",
+      "solutions": [
+        "Strictly enforce anti-fixing and anti-corruption policies",
+        "Provide clear complaint and whistleblowing channels",
+        "Train staff on ethical behavior and accountability",
+        "Display service commitments and integrity pledges"
+      ]
+    },
+
+    "assurance": {
+      "category": "Service Quality",
+      "issue": "Citizens lack confidence in staff competence",
+      "root_cause": "Insufficient training and uneven staff skill levels",
+      "impact": "Citizens doubt the accuracy and professionalism of services",
+      "solutions": [
+        "Conduct regular skills and knowledge training for staff",
+        "Ensure staff are familiar with service procedures",
+        "Assign experienced staff to complex transactions",
+        "Encourage courteous and professional behavior"
+      ]
+    },
+
+    "outcome": {
+      "category": "Service Results",
+      "issue": "Service outcomes do not meet citizen expectations",
+      "root_cause": "Weak evaluation of completed services and limited feedback utilization",
+      "impact": "Citizens perceive services as ineffective or low quality",
+      "solutions": [
+        "Review completed transactions for quality and accuracy",
+        "Use citizen feedback to improve service outcomes",
+        "Set performance targets for service completion",
+        "Continuously improve service processes based on results"
+      ]
+    }
   },
-  "Overall Service Experience": {
-    "issue": "High public dissatisfaction",
-    "solutions": [
-      "Analyze complaint themes",
-      "Conduct service quality training",
-      "Create a service improvement task force"
-    ]
+
+  "cross_cutting_issues": {
+    "overall_service_experience": {
+      "category": "Public Satisfaction",
+      "issue": "High overall public dissatisfaction with government services",
+      "root_cause": "Multiple service weaknesses across different service quality dimensions",
+      "impact": "Low public confidence and negative perception of government performance",
+      "solutions": [
+        "Analyze negative feedback to identify common problem patterns",
+        "Create a comprehensive service improvement action plan",
+        "Conduct customer service and values training for all staff",
+        "Monitor service performance regularly and apply corrective actions"
+      ]
+    },
+
+    "citizen_charter_awareness": {
+      "category": "Information Dissemination",
+      "issue": "Low public awareness of the Citizen’s Charter",
+      "root_cause": "Insufficient and ineffective information dissemination strategies",
+      "impact": "Citizens are unaware of their rights, service standards, and timelines",
+      "solutions": [
+        "Post the Citizen’s Charter in visible public areas",
+        "Distribute brochures explaining available services",
+        "Publish the Citizen’s Charter on the website and social media",
+        "Educate citizens on their rights and service standards"
+      ]
+    }
   },
-  "Citizen Charter Awareness": {
-    "issue": "Low awareness of Citizen’s Charter",
-    "solutions": [
-      "Post Citizen Charter in visible locations",
-      "Distribute brochures",
-      "Use social media and website announcements"
-    ]
+
+  "sentiment_integration_rules": {
+    "purpose": "Guidelines for combining sentiment analysis with service quality issues",
+    "rules": {
+      "critical": "If negative sentiment percentage is 60% or higher",
+      "high": "If negative sentiment percentage is between 40% and 59%",
+      "moderate": "If negative sentiment percentage is between 20% and 39%",
+      "low": "If negative sentiment percentage is below 20%"
+    },
+    "usage": "Sentiment severity should be used to prioritize issues and escalate recommendations, not to replace service quality scores."
   }
 }

@@ -6,6 +6,8 @@ from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
 
 from services.recommendations.issue_detector import detect_issues
+from services.recommendations.recommendation_engine import generate_recommendations
+from services.recommendations.recommendation_service import generate_decision_support
 
 from model.get_feedback import get_daily_feedback
 
@@ -62,6 +64,9 @@ def run_services_tests():
     result = analyze_citizens_charter(cc_data)
     data["awareness"] = result
     
+    
+    
     issue = detect_issues(data)
-    print(issue)
+    recommendation = generate_recommendations(issue)
+    print(recommendation)
     print("Running services tests...")
