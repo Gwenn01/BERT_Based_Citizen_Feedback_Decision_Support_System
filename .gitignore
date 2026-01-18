@@ -13,4 +13,7 @@ build/
 *.egg-info/
 
 # This covers any folder named venv anywhere in the project
+
 **/venv/
+
+.vs/
