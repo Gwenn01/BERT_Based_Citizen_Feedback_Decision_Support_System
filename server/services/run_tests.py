@@ -11,8 +11,6 @@ from services.recommendations.recommendation_service import generate_decision_su
 
 from model.get_feedback import get_daily_feedback
 
-
-
 def run_services_tests():
     feedback = get_daily_feedback()
     comments = []
@@ -46,27 +44,24 @@ def run_services_tests():
     # print("Fetched Citizen's Charter Awareness:", result)
     
     #detect_issues test
-    data = {}
-    result_survey = analyze_survey(feedback)
-    data["survey"] = result_survey
+    # data = {}
+    # result_survey = analyze_survey(feedback)
+    # data["survey"] = result_survey
     
-    for f in feedback:
-       comments.append(translate_filipino_to_english(f["comment"]))
-    result = analyze_sentiment(comments)
-    data["sentiment"] = result
+    # for f in feedback:
+    #    comments.append(translate_filipino_to_english(f["comment"]))
+    # result = analyze_sentiment(comments)
+    # data["sentiment"] = result
     
-    for f in feedback:
-        cc_data.append({
-            "cc1": f["cc1"],
-            "cc2": f["cc2"],
-            "cc3": f["cc3"]
-        })
-    result = analyze_citizens_charter(cc_data)
-    data["awareness"] = result
+    # for f in feedback:
+    #     cc_data.append({
+    #         "cc1": f["cc1"],
+    #         "cc2": f["cc2"],
+    #         "cc3": f["cc3"]
+    #     })
+    # result = analyze_citizens_charter(cc_data)
+    # data["awareness"] = result
     
-    
-    
-    issue = detect_issues(data)
-    recommendation = generate_recommendations(issue)
-    print(recommendation)
+    # recommendation = generate_decision_support(data)
+    # print(recommendation)
     print("Running services tests...")
