@@ -3,6 +3,8 @@ from flask_cors import CORS
 from model.run_tests import run_model_tests
 from controllers.run_tests import run_controller_tests
 from services.run_tests import run_services_tests
+from services.scheduler.run_summary import start_scheduler
+
 # -------------------------------------------------
 # Flask Initialization
 # -------------------------------------------------
@@ -36,4 +38,5 @@ if __name__ == "__main__":
     run_model_tests()
     run_controller_tests()
     run_services_tests()
+    start_scheduler()
     app.run(debug=True)
