@@ -35,11 +35,12 @@ def analyze_sentiment(comments):
         k: round((v / valid) * 100, 2) if valid else 0
         for k, v in counts.items()
     }
-
+    sentiment_score = (((round(total_confidence / valid, 2) if valid else 0) + 1) / 2) * 100
     return {
         "total": valid,
         "counts": counts,
         "percentages": percentages,
+        "sentiment_score": sentiment_score,
         "average_confidence": round(total_confidence / valid, 2) if valid else 0
     }
 

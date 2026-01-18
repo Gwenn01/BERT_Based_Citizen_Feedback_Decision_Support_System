@@ -30,7 +30,7 @@ def get_weekly_feedback():
 def get_daily_feedback():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback WHERE service_date >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")
+    cursor.execute("SELECT * FROM feedback WHERE service_date = CURDATE()")
     feedback = cursor.fetchall()
     cursor.close()
     conn.close()
