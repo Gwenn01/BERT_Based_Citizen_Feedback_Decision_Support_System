@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import datetime
 
 def format_dashboard_response(row):
     if not row:
@@ -84,3 +85,36 @@ def format_dashboard_response(row):
             "cc3": f(row["cc3_awareness_percent"])
         }
     }
+    
+
+
+def format_time(created_at):
+    if not created_at:
+        return ""
+
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+
+    return created_at.strftime("%I:%M %p")
+
+
+def format_recent_feedback(rows):
+    """
+    rows = list of dicts from DB
+    """
+
+    formatted = []
+
+    for row in rows:
+        formatted.append({
+            "id": row["feedback_id"],
+            "client": row["client_type"],
+            "service": row.get("service_type", "Unknown Service"),
+            "text": row.get("comment", ""),
+            "time": format_time(row.get("service_date")),
+        })
+
+    return {
+        "feedback": formatted
+    }
+    
