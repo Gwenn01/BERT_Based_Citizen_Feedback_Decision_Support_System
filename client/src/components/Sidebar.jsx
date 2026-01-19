@@ -48,13 +48,34 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       
       {/* Logo Section */}
       <div className="p-6 border-b border-slate-800">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="bg-blue-600 p-2 rounded-lg text-white">
-            <BrainCircuit size={24} />
+        <div className="flex flex-col items-center text-center group">
+          
+          {/* LOGO CONTAINER - Perfectly Circular */}
+          <div className="relative mb-4">
+            {/* Background Glow Effect */}
+            <div className="absolute -inset-2 bg-blue-600/20 rounded-full blur-xl group-hover:bg-blue-600/30 transition duration-500 opacity-70"></div>
+            
+            {/* The Image Circle */}
+            <div className="relative w-24 h-24 rounded-full border-2 border-slate-700 p-1 bg-slate-900 group-hover:border-blue-500 transition-colors duration-500 overflow-hidden">
+              <img 
+                src="/lgu-iba-logo.jpg" 
+                alt="LGU Iba Logo" 
+                className="w-full h-full rounded-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
           </div>
-          <div>
-            <h1 className="text-white font-bold text-lg leading-none tracking-tight">BERT-DSS</h1>
-            <p className="text-[10px] text-slate-500 uppercase font-semibold mt-1">Decision Support</p>
+
+          {/* TEXT SECTION */}
+          <div className="space-y-1.5">
+            <h1 className="text-white font-black text-sm leading-tight tracking-[0.05em] uppercase">
+              Municipality of Iba
+            </h1>
+            
+            <div className="flex flex-col">
+              <p className="text-[8px] text-slate-400 font-bold uppercase tracking-[0.15em] leading-tight">
+                Local Government Service Portal
+              </p>
+            </div>
           </div>
         </div>
       </div>
