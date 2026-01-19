@@ -42,21 +42,21 @@ def home():
 #     end_date=today
 # )
 
-today = date.today()
-start_date = today - timedelta(days=6)  # includes today (7 days total)
-generate_period_summary(
-    period_type="weekly",
-    start_date=start_date,
-    end_date=today
-)
+# today = date.today()
+# start_date = today - timedelta(days=6)  # includes today (7 days total)
+# generate_period_summary(
+#     period_type="weekly",
+#     start_date=start_date,
+#     end_date=today
+# )
 
-today = date.today()
-start_date = today.replace(day=1)
-generate_period_summary(
-    period_type="monthly",
-    start_date=start_date,
-    end_date=today
-)
+# today = date.today()
+# start_date = today.replace(day=1)
+# generate_period_summary(
+#     period_type="monthly",
+#     start_date=start_date,
+#     end_date=today
+# )
 # -------------------------------------------------
 # -------------------------------------------------
 # Entry Point
