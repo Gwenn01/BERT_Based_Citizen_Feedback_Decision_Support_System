@@ -71,10 +71,10 @@
             lblPetsa = new Label();
             lblOffice = new Label();
             grpCitizensCharter = new GroupBox();
-            checkBox2 = new CheckBox();
-            checkBox3 = new CheckBox();
-            checkBox4 = new CheckBox();
-            checkBox5 = new CheckBox();
+            chkCC3_4 = new CheckBox();
+            chkCC3_3 = new CheckBox();
+            chkCC3_2 = new CheckBox();
+            chkCC3_1 = new CheckBox();
             label4 = new Label();
             chkCC2_5 = new CheckBox();
             chkCC2_4 = new CheckBox();
@@ -384,10 +384,10 @@
             // 
             // grpCitizensCharter
             // 
-            grpCitizensCharter.Controls.Add(checkBox2);
-            grpCitizensCharter.Controls.Add(checkBox3);
-            grpCitizensCharter.Controls.Add(checkBox4);
-            grpCitizensCharter.Controls.Add(checkBox5);
+            grpCitizensCharter.Controls.Add(chkCC3_4);
+            grpCitizensCharter.Controls.Add(chkCC3_3);
+            grpCitizensCharter.Controls.Add(chkCC3_2);
+            grpCitizensCharter.Controls.Add(chkCC3_1);
             grpCitizensCharter.Controls.Add(label4);
             grpCitizensCharter.Controls.Add(chkCC2_5);
             grpCitizensCharter.Controls.Add(chkCC2_4);
@@ -409,45 +409,45 @@
             grpCitizensCharter.TabStop = false;
             grpCitizensCharter.Text = "Citizen's Charter Awareness";
             // 
-            // checkBox2
+            // chkCC3_4
             // 
-            checkBox2.Font = new Font("Segoe UI", 9.75F);
-            checkBox2.Location = new Point(27, 400);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(150, 18);
-            checkBox2.TabIndex = 16;
-            checkBox2.Text = "4. N/A";
-            checkBox2.UseVisualStyleBackColor = true;
+            chkCC3_4.Font = new Font("Segoe UI", 9.75F);
+            chkCC3_4.Location = new Point(27, 400);
+            chkCC3_4.Name = "chkCC3_4";
+            chkCC3_4.Size = new Size(150, 18);
+            chkCC3_4.TabIndex = 16;
+            chkCC3_4.Text = "4. N/A";
+            chkCC3_4.UseVisualStyleBackColor = true;
             // 
-            // checkBox3
+            // chkCC3_3
             // 
-            checkBox3.Font = new Font("Segoe UI", 9.75F);
-            checkBox3.Location = new Point(27, 378);
-            checkBox3.Name = "checkBox3";
-            checkBox3.Size = new Size(150, 18);
-            checkBox3.TabIndex = 15;
-            checkBox3.Text = "3. Hindi nakatulong";
-            checkBox3.UseVisualStyleBackColor = true;
+            chkCC3_3.Font = new Font("Segoe UI", 9.75F);
+            chkCC3_3.Location = new Point(27, 378);
+            chkCC3_3.Name = "chkCC3_3";
+            chkCC3_3.Size = new Size(150, 18);
+            chkCC3_3.TabIndex = 15;
+            chkCC3_3.Text = "3. Hindi nakatulong";
+            chkCC3_3.UseVisualStyleBackColor = true;
             // 
-            // checkBox4
+            // chkCC3_2
             // 
-            checkBox4.Font = new Font("Segoe UI", 9.75F);
-            checkBox4.Location = new Point(27, 356);
-            checkBox4.Name = "checkBox4";
-            checkBox4.Size = new Size(172, 18);
-            checkBox4.TabIndex = 14;
-            checkBox4.Text = "2. Medyo nakakatulong";
-            checkBox4.UseVisualStyleBackColor = true;
+            chkCC3_2.Font = new Font("Segoe UI", 9.75F);
+            chkCC3_2.Location = new Point(27, 356);
+            chkCC3_2.Name = "chkCC3_2";
+            chkCC3_2.Size = new Size(172, 18);
+            chkCC3_2.TabIndex = 14;
+            chkCC3_2.Text = "2. Medyo nakakatulong";
+            chkCC3_2.UseVisualStyleBackColor = true;
             // 
-            // checkBox5
+            // chkCC3_1
             // 
-            checkBox5.Font = new Font("Segoe UI", 9.75F);
-            checkBox5.Location = new Point(27, 334);
-            checkBox5.Name = "checkBox5";
-            checkBox5.Size = new Size(172, 18);
-            checkBox5.TabIndex = 13;
-            checkBox5.Text = "1. Lubos na nakatulong";
-            checkBox5.UseVisualStyleBackColor = true;
+            chkCC3_1.Font = new Font("Segoe UI", 9.75F);
+            chkCC3_1.Location = new Point(27, 334);
+            chkCC3_1.Name = "chkCC3_1";
+            chkCC3_1.Size = new Size(172, 18);
+            chkCC3_1.TabIndex = 13;
+            chkCC3_1.Text = "1. Lubos na nakatulong";
+            chkCC3_1.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
@@ -571,7 +571,7 @@
             lblCCInstruction.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblCCInstruction.Location = new Point(15, 27);
             lblCCInstruction.Name = "lblCCInstruction";
-            lblCCInstruction.Size = new Size(870, 56);
+            lblCCInstruction.Size = new Size(939, 56);
             lblCCInstruction.TabIndex = 0;
             lblCCInstruction.Text = resources.GetString("lblCCInstruction.Text");
             // 
@@ -1616,10 +1616,10 @@
         private Label lblRating2;
         private Label lblRating1;
         public GroupBox grpSatisfaction;
-        private CheckBox checkBox2;
-        private CheckBox checkBox3;
-        private CheckBox checkBox4;
-        private CheckBox checkBox5;
+        private CheckBox chkCC3_4;
+        private CheckBox chkCC3_3;
+        private CheckBox chkCC3_2;
+        private CheckBox chkCC3_1;
         private Label label4;
         private PictureBox pictureBox6;
         private PictureBox pictureBox5;

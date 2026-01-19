@@ -7,7 +7,7 @@ namespace Survey_Form
 {
     public partial class Form1 : Form
     {
-        private const string API_URL = "http://localhost:5000/api/survey"; // Change to your Flask API URL
+        private const string API_URL = "http://127.0.0.1:5000/api/get-survey-client"; // Change to your Flask API URL
 
         public Form1()
         {
@@ -93,8 +93,10 @@ namespace Survey_Form
                 ["communication"] = GetScoreFromGroup(gbxCommunication),
                 ["costs"] = GetScoreFromGroup(gbxCost),
                 ["integrity"] = GetScoreFromGroup(gbxIntegrity),
-                ["assurance"] = 0, // Add assurance field if needed
-                ["outcome"] = 0, // Add outcome field if needed
+
+                // ✅ FIXED: Set valid defaults (3 = neutral rating)
+                ["assurance"] = 3,
+                ["outcome"] = 3,
 
                 // Optional fields
                 ["comment"] = txtComment.Text,
@@ -105,7 +107,7 @@ namespace Survey_Form
             return data;
         }
 
-        // ========== SEND TO FLASK API ==========
+        // ========== SEND TO FLASK API (IMPROVED) ==========
         private async Task<bool> SendToApi(string jsonData)
         {
             try
@@ -115,15 +117,32 @@ namespace Survey_Form
                     client.Timeout = TimeSpan.FromSeconds(30);
 
                     var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                    // Log what we're sending
+                    System.Diagnostics.Debug.WriteLine("Sending JSON:");
+                    System.Diagnostics.Debug.WriteLine(jsonData);
+
                     var response = await client.PostAsync(API_URL, content);
 
-                    return response.IsSuccessStatusCode;
+                    // Get response body for debugging
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"Response Status: {response.StatusCode}");
+                    System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"Server Error ({response.StatusCode}): {responseBody}",
+                            "API Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"API Error: {ex.Message}", "Connection Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"API Error: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -132,22 +151,119 @@ namespace Survey_Form
         private bool ValidateForm()
         {
             if (string.IsNullOrWhiteSpace(cbxOpisina.Text))
+            {
+                MessageBox.Show("Please select an office.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
 
             if (!rdoGeneralPublic.Checked && !rdoGovEmployee.Checked && !rdoBusiness.Checked)
+            {
+                MessageBox.Show("Please select a client type.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
 
             if (!rdoLalaki.Checked && !rdoBabae.Checked)
+            {
+                MessageBox.Show("Please select gender.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
 
             if (string.IsNullOrWhiteSpace(txtEdad.Text))
+            {
+                MessageBox.Show("Please enter your age.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
+
+            // Validate age is a number
+            if (!int.TryParse(txtEdad.Text, out int age) || age < 1 || age > 120)
+            {
+                MessageBox.Show("Please enter a valid age (1-120).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
 
             if (string.IsNullOrWhiteSpace(txtTirahan.Text))
+            {
+                MessageBox.Show("Please enter your place of residence.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
 
             if (string.IsNullOrWhiteSpace(txtService.Text))
+            {
+                MessageBox.Show("Please enter the service type.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
+            }
+
+            // ✅ ADDED: Validate rating groups
+            if (GetScoreFromGroup(gbxResponsiveness) == 0)
+            {
+                MessageBox.Show("Please rate Responsiveness (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetScoreFromGroup(gbxReliability) == 0)
+            {
+                MessageBox.Show("Please rate Reliability (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetScoreFromGroup(gbxFacilities) == 0)
+            {
+                MessageBox.Show("Please rate Facilities (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetScoreFromGroup(gbxCommunication) == 0)
+            {
+                MessageBox.Show("Please rate Communication (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetScoreFromGroup(gbxCost) == 0)
+            {
+                MessageBox.Show("Please rate Costs (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetScoreFromGroup(gbxIntegrity) == 0)
+            {
+                MessageBox.Show("Please rate Integrity (1-5).", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // ✅ ADDED: Validate Citizens Charter responses
+            if (GetCCResponse(1) == 0)
+            {
+                MessageBox.Show("Please answer Citizens Charter Question 1.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetCCResponse(2) == 0)
+            {
+                MessageBox.Show("Please answer Citizens Charter Question 2.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (GetCCResponse(3) == 0)
+            {
+                MessageBox.Show("Please answer Citizens Charter Question 3.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
 
             return true;
         }
@@ -168,6 +284,7 @@ namespace Survey_Form
             return "";
         }
 
+        // ========== FIXED: Citizens Charter Response Getter ==========
         private int GetCCResponse(int questionNumber)
         {
             List<CheckBox> checkboxes = new List<CheckBox>();
@@ -182,7 +299,8 @@ namespace Survey_Form
             }
             else if (questionNumber == 3)
             {
-                checkboxes = new List<CheckBox> { checkBox5, checkBox4, checkBox3, checkBox2 };
+                // FIXED: Changed from inconsistent names to proper naming
+                checkboxes = new List<CheckBox> { chkCC3_1, chkCC3_2, chkCC3_3, chkCC3_4 };
             }
 
             for (int i = 0; i < checkboxes.Count; i++)
@@ -244,11 +362,21 @@ namespace Survey_Form
             dateTimePicker1.Value = DateTime.Now;
 
             // Clear all checkboxes
-            foreach (var control in Controls.OfType<GroupBox>())
+            ClearAllCheckboxes(this);
+        }
+
+        // ========== HELPER: Clear all checkboxes recursively ==========
+        private void ClearAllCheckboxes(Control parent)
+        {
+            foreach (Control control in parent.Controls)
             {
-                foreach (var checkbox in control.Controls.OfType<CheckBox>())
+                if (control is CheckBox checkbox)
                 {
                     checkbox.Checked = false;
+                }
+                else if (control.HasChildren)
+                {
+                    ClearAllCheckboxes(control);
                 }
             }
         }
@@ -256,12 +384,18 @@ namespace Survey_Form
         // ========== MAKE ALL CHECKBOX GROUPS ACT LIKE RADIO BUTTONS ==========
         private void InitializeCheckboxLogic()
         {
+            // Service rating groups
             AttachGroupLogic(gbxResponsiveness);
             AttachGroupLogic(gbxReliability);
             AttachGroupLogic(gbxFacilities);
             AttachGroupLogic(gbxCommunication);
             AttachGroupLogic(gbxCost);
             AttachGroupLogic(gbxIntegrity);
+
+            // Citizens Charter groups - make them act like radio buttons
+            AttachCCGroupLogic(new[] { chkCC1_1, chkCC1_2, chkCC1_3, chkCC1_4 });
+            AttachCCGroupLogic(new[] { chkCC2_1, chkCC2_2, chkCC2_3, chkCC2_4, chkCC2_5 });
+            AttachCCGroupLogic(new[] { chkCC3_1, chkCC3_2, chkCC3_3, chkCC3_4 });
         }
 
         private void AttachGroupLogic(GroupBox group)
@@ -282,6 +416,25 @@ namespace Survey_Form
             }
         }
 
+        // ========== Citizens Charter radio button logic ==========
+        private void AttachCCGroupLogic(CheckBox[] checkboxes)
+        {
+            foreach (CheckBox cb in checkboxes)
+            {
+                cb.CheckedChanged += (s, e) =>
+                {
+                    if (cb.Checked)
+                    {
+                        foreach (CheckBox other in checkboxes)
+                        {
+                            if (other != cb)
+                                other.Checked = false;
+                        }
+                    }
+                };
+            }
+        }
+
         // ========== GENERIC FUNCTION TO GET SCORE FROM ANY GROUP ==========
         private int GetScoreFromGroup(GroupBox gb)
         {
@@ -289,10 +442,13 @@ namespace Survey_Form
             {
                 if (cb.Checked)
                 {
-                    // extract last character as number (0–5)
+                    // extract last character as number (1–5)
                     string text = cb.Name;
                     char last = text[text.Length - 1];
-                    return int.Parse(last.ToString());
+                    if (char.IsDigit(last))
+                    {
+                        return int.Parse(last.ToString());
+                    }
                 }
             }
             return 0; // none selected
