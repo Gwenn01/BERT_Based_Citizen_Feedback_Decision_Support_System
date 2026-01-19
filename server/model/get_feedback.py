@@ -36,6 +36,23 @@ def get_daily_feedback():
     conn.close()
     return feedback
 
+def get_recent_feedback():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT *
+        FROM feedback
+        ORDER BY created_at DESC
+        LIMIT 3
+    """)
+
+    feedback = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return feedback
+
+
 def get_feedback_by_service(service_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
