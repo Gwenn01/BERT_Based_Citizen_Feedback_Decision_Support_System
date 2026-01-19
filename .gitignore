@@ -17,3 +17,7 @@ build/
 **/venv/
 
 .vs/
+# Secrets
+.env
+server/token.txt
+server/myHug.txt
