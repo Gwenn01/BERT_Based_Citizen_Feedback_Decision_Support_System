@@ -9,8 +9,8 @@ from services.summary_result.survey_agent import analyze_survey
 from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
 from ai.translator import translate_filipino_to_english
-
-
+from services.recommendations.recommendation_service import generate_decision_support
+from controllers.recommendation_controller import save_recommendations
 
 def generate_period_summary(period_type, start_date, end_date):
     # 1. Get feedback
@@ -29,12 +29,15 @@ def generate_period_summary(period_type, start_date, end_date):
     # 2. Analyze
     comments = []
     cc_data = []
+    data = {}
     
     result_survey = analyze_survey(feedback)
+    data["survey"] = result_survey
     
     for f in feedback:
        comments.append(translate_filipino_to_english(f["comment"]))
     result_sentiment = analyze_sentiment(comments)
+    data["sentiment"] = result_sentiment
     
     for f in feedback:
         cc_data.append({
@@ -43,7 +46,8 @@ def generate_period_summary(period_type, start_date, end_date):
             "cc3": f["cc3"]
         })
     result_awareness = analyze_citizens_charter(cc_data)
-
+    data["awareness"] = result_awareness
+    
     # 3. Build summary payload
     summary_data = {
         "period": {
@@ -55,8 +59,10 @@ def generate_period_summary(period_type, start_date, end_date):
         "sentiment": result_sentiment,
         "awareness": result_awareness
     }
-
     # 4. Save to DB
-    insert_summary(summary_data)
+    period_id = insert_summary(summary_data)
+    # insert recommendations 
+    recommendation_support = generate_decision_support(data)
+    save_recommendations(period_id, recommendation_support["recommendations"])
 
     return summary_data
