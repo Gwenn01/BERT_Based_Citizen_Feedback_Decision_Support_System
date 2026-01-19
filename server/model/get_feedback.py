@@ -36,7 +36,7 @@ def get_daily_feedback():
     conn.close()
     return feedback
 
-def get_recent_feedback():
+def fetch_recent_feedback():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -53,7 +53,7 @@ def get_recent_feedback():
     return feedback
 
 
-def get_feedback_by_service(service_id):
+def fetch_feedback_by_service(service_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM feedback WHERE service_id = %s", (service_id,))
