@@ -28,48 +28,6 @@ import {
 } from "recharts";
 import axios from "axios";
 
-// --- 1. DYNAMIC MOCK DATABASE ---
-const feedback = {
-  feedback: [
-    {
-      id: 1,
-      user: "Citizen #4021",
-      service: "General Services",
-      text: "The wait time was too long and the office was too hot. Facilities need improvement.",
-      sentiment: "Negative",
-      time: "10:15 AM",
-      impact: "Low Responsiveness",
-    },
-    {
-      id: 2,
-      user: "Citizen #4025",
-      service: "Treasury",
-      text: "Processing was clear, but the staff seemed tired. Communication could be better.",
-      sentiment: "Neutral",
-      time: "11:30 AM",
-      impact: "Communication",
-    },
-    {
-      id: 3,
-      user: "Citizen #4030",
-      service: "Health Office",
-      text: "Very helpful doctors, though the laboratory equipment looks old.",
-      sentiment: "Positive",
-      time: "1:45 PM",
-      impact: "Facilities",
-    },
-    {
-      id: 4,
-      user: "Citizen #4032",
-      service: "Engineering",
-      text: "The fees were exactly as listed in the charter. Fair pricing.",
-      sentiment: "Positive",
-      time: "3:00 PM",
-      impact: "Costs",
-    },
-  ],
-};
-
 // --- 2. ICON HELPER ---
 const getIcon = (name, size = 24) => {
   const icons = {
@@ -154,24 +112,80 @@ const KPICard = ({
 // --- 4. MAIN COMPONENT ---
 const AdminOverview = () => {
   const [activeFilter, setActiveFilter] = useState("1 Daily");
-  const currentView = dashboardDatabase[activeFilter];
   const [dashboardDatabase, setDashboardDatabase] = useState({});
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/api/dashboard");
-        setDashboardDatabase(response.data);
+        setLoading(true);
+        const [dashRes, feedbackRes] = await Promise.all([
+          axios.get("http://127.0.0.1:5000/api/dashboard"),
+          axios.get("http://127.0.0.1:5000/api/recent-feedback")
+        ]);
+
+        setDashboardDatabase(dashRes.data);
+        setFeedbackData(feedbackRes.data.feedback || feedbackRes.data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load dashboard data");
+        setError("Failed to sync system data.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchDashboard();
+    fetchData();
   }, []);
+
+  if (loading) {
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-8 space-y-10">
+      {/* Header Skeleton */}
+      <div className="flex justify-between items-center animate-pulse">
+        <div className="space-y-3">
+          <div className="h-8 w-64 bg-slate-200 rounded-lg" />
+          <div className="h-4 w-40 bg-slate-200 rounded-lg" />
+        </div>
+        <div className="h-12 w-48 bg-slate-200 rounded-2xl" />
+      </div>
+      
+      {/* KPI Cards Skeleton */}
+      <div className="grid grid-cols-4 gap-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-32 bg-slate-200 rounded-[2rem] animate-pulse" />
+        ))}
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="grid grid-cols-12 gap-8">
+        <div className="col-span-4 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
+        <div className="col-span-8 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-red-50 text-red-600 p-4 rounded-3xl border border-red-100 mb-4">
+          <Activity size={40} />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">System Offline</h2>
+        <p className="text-slate-500 text-sm max-w-xs mb-6 font-medium">{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
+
+  const currentView = dashboardDatabase[activeFilter];
+  if (!currentView) return null;
 
   const performanceData = Object.entries(currentView.averages).map(
     ([name, score]) => ({
@@ -270,23 +284,34 @@ const AdminOverview = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={currentView.sentiment}
-                      innerRadius={70}
-                      outerRadius={90}
+                      data={currentView.sentiment.map(s => ({
+                        ...s,
+                        color: s.name === "Positive" ? "#10b981" :
+                              s.name === "Neutral" ? "#f59e0b" :  
+                              "#f43f5e"                         
+                      }))}
+                      innerRadius={80}
+                      outerRadius={100}
                       paddingAngle={8}
                       dataKey="value"
                       stroke="none"
                       animationBegin={0}
                       animationDuration={1500}
                     >
-                      {currentView.sentiment.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color}
-                          cornerRadius={12}
-                          className="hover:opacity-80 transition-opacity cursor-pointer"
-                        />
-                      ))}
+                      {currentView.sentiment.map((entry, index) => {
+                        // Logic para sa Cell Colors
+                        const cellColor = entry.name === "Positive" ? "#10b981" : 
+                                        entry.name === "Neutral" ? "#f59e0b" : 
+                                        "#f43f5e";
+                        return (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={cellColor}
+                            cornerRadius={12}
+                            className="hover:opacity-80 transition-opacity cursor-pointer"
+                          />
+                        );
+                      })}
                     </Pie>
                     <Tooltip
                       content={({ active, payload }) => {
@@ -295,7 +320,7 @@ const AdminOverview = () => {
                             <div className="bg-slate-900 px-3 py-2 rounded-xl shadow-xl border border-slate-800">
                               <p className="text-[10px] font-black text-white uppercase tracking-widest">
                                 {payload[0].name}:{" "}
-                                <span className="text-blue-400">
+                                <span style={{ color: payload[0].payload.color }}>
                                   {payload[0].value}%
                                 </span>
                               </p>
@@ -308,15 +333,13 @@ const AdminOverview = () => {
                   </PieChart>
                 </ResponsiveContainer>
 
-                {/* Center Label - Enhanced Typography */}
+                {/* Center Label - Dynamic Color based on dominant sentiment */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
-                    {currentView.sentiment.find((s) => s.name === "Positive")
-                      ?.value || 0}
-                    %
+                    {currentView.sentiment.find((s) => s.name === "Positive")?.value || 0}%
                   </span>
                   <div className="flex items-center gap-1 mt-1">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                       Positive
                     </span>
@@ -324,27 +347,33 @@ const AdminOverview = () => {
                 </div>
               </div>
 
-              {/* Legend Grid - Modern Pill Style */}
+              {/* Legend Grid - Modern Pill Style with Dynamic Colors */}
               <div className="grid grid-cols-3 gap-3 mt-8 w-full pt-6 border-t border-slate-50">
-                {currentView.sentiment.map((s) => (
-                  <div
-                    key={s.name}
-                    className="flex flex-col items-center p-2 rounded-2xl hover:bg-slate-50 transition-colors"
-                  >
-                    <span className="text-sm font-black text-slate-900">
-                      {s.value}%
-                    </span>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <div
-                        className="w-1 h-1 rounded-full"
-                        style={{ backgroundColor: s.color }}
-                      />
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">
-                        {s.name}
+                {currentView.sentiment.map((s) => {
+                  const activeColor = s.name === "Positive" ? "text-emerald-500" : 
+                                      s.name === "Neutral" ? "text-amber-500" : 
+                                      "text-rose-500";
+                  const dotColor = s.name === "Positive" ? "bg-emerald-500" : 
+                                  s.name === "Neutral" ? "bg-amber-500" : 
+                                  "bg-rose-500";
+                  
+                  return (
+                    <div
+                      key={s.name}
+                      className="flex flex-col items-center p-2 rounded-2xl hover:bg-slate-50 transition-colors"
+                    >
+                      <span className={`text-sm font-black ${activeColor}`}>
+                        {s.value}%
                       </span>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className={`w-1 h-1 rounded-full ${dotColor}`} />
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">
+                          {s.name}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Subtle Background Detail */}
@@ -615,116 +644,79 @@ const AdminOverview = () => {
             </div>
           </div>
 
-          {/* --- FULL WIDTH: FEEDBACK TABLE --- */}
-          <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 overflow-hidden">
-            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
-              <div className="space-y-1">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                  Recent Feedback Activity
-                </h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                  <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                  Live Citizen Responses
-                </p>
-              </div>
-              <div className="flex gap-2"></div>
-            </div>
-
-            <div className="overflow-x-auto px-4 pb-4 mt-2">
-              <table className="w-full text-left border-separate border-spacing-y-2">
-                <thead>
-                  <tr className="text-slate-400">
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Citizen / User
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Feedback Detail
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Sentiment Analysis
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Impact Area
-                    </th>
-                    <th className="px-6 py-4 text-right"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y-0">
-                  {feedback.feedback.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="group transition-all duration-300 hover:scale-[1.005]"
-                    >
-                      {/* User Info */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
-                        <div className="flex items-center gap-4">
-                          <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-all">
-                            #{item.user.split("#")[1]}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-black text-slate-700">
-                              {item.user}
-                            </span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                              {item.service}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Comment Text */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm max-w-sm">
-                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
-                          "{item.text}"
-                        </p>
-                      </td>
-
-                      {/* Sentiment Badge */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
-                        <div
-                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase border shadow-xs ${
-                            item.sentiment === "Positive"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                              : item.sentiment === "Neutral"
-                                ? "bg-slate-50 text-slate-600 border-slate-200"
-                                : "bg-rose-50 text-rose-700 border-rose-100"
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              item.sentiment === "Positive"
-                                ? "bg-emerald-500"
-                                : item.sentiment === "Neutral"
-                                  ? "bg-slate-400"
-                                  : "bg-rose-500"
-                            }`}
-                          />
-                          {item.sentiment}
-                        </div>
-                        <p className="text-[9px] font-bold text-slate-400 mt-1 ml-1">
-                          {item.time}
-                        </p>
-                      </td>
-
-                      {/* Impact Area Label */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
-                        <span className="px-3 py-1 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-lg uppercase tracking-tight group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
-                          {item.impact}
-                        </span>
-                      </td>
-
-                      {/* Action */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 group-hover:shadow-sm text-right">
-                        <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all hover:shadow-sm">
-                          <ChevronRight size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+          {/* Table Header Section */}
+          <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">Recent Feedback Activity</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                Live Citizen Responses
+              </p>
             </div>
           </div>
+
+          <div className="overflow-x-auto px-4 pb-4 mt-2">
+            <table className="w-full text-left border-separate border-spacing-y-2">
+              <thead>
+                <tr className="text-slate-400">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Citizen / User</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Feedback Detail</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Service Area</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Timestamp</th>
+                  <th className="px-6 py-4 text-right"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y-0">
+                {feedbackData.map((item) => (
+                  <tr key={item.id} className="group transition-all duration-300 hover:scale-[1.005]">
+                    {/* User / Client Info */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100">
+                      <div className="flex items-center gap-4">
+                        <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm">
+                          #{item.id}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-black text-slate-700">{item.client || "Anonymous"}</span>
+                          <span className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">ID: {item.id}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Feedback Text */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 max-w-sm">
+                      <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
+                        "{item.text}"
+                      </p>
+                    </td>
+
+                    {/* Service Type */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
+                      <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                        {item.service}
+                      </span>
+                    </td>
+
+                    {/* Time Received */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-slate-500">{item.time}</span>
+                        <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest">Received</span>
+                      </div>
+                    </td>
+
+                    {/* Action */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 text-right">
+                      <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all">
+                        <ChevronRight size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
         </div>
       </div>
     </div>
