@@ -10,7 +10,7 @@ import {
   MessageSquare, 
   Download, 
   BarChart3,
-  MoreHorizontal
+  ChevronRight
 } from "lucide-react";
 import {
   PieChart,
@@ -95,44 +95,6 @@ const dashboardDatabase = {
       cc2: 69.57,
       cc3: 66.67,
     },
-    feedback: [
-      {
-        id: 1,
-        user: "Citizen #4021",
-        service: "General Services",
-        text: "The wait time was too long and the office was too hot. Facilities need improvement.",
-        sentiment: "Negative",
-        time: "10:15 AM",
-        impact: "Low Responsiveness"
-      },
-      {
-        id: 2,
-        user: "Citizen #4025",
-        service: "Treasury",
-        text: "Processing was clear, but the staff seemed tired. Communication could be better.",
-        sentiment: "Neutral",
-        time: "11:30 AM",
-        impact: "Communication"
-      },
-      {
-        id: 3,
-        user: "Citizen #4030",
-        service: "Health Office",
-        text: "Very helpful doctors, though the laboratory equipment looks old.",
-        sentiment: "Positive",
-        time: "1:45 PM",
-        impact: "Facilities"
-      },
-      {
-        id: 4,
-        user: "Citizen #4032",
-        service: "Engineering",
-        text: "The fees were exactly as listed in the charter. Fair pricing.",
-        sentiment: "Positive",
-        time: "3:00 PM",
-        impact: "Costs"
-      }
-    ]
   },
   "7 Weekly": {
     kpi: [
@@ -199,35 +161,6 @@ const dashboardDatabase = {
       cc2: 73.20,
       cc3: 69.90,
     },
-    feedback: [
-      {
-        id: 10,
-        user: "Citizen #3882",
-        service: "Building Permit",
-        text: "Process is faster than last month. Good job to the team!",
-        sentiment: "Positive",
-        time: "2 days ago",
-        impact: "Responsiveness"
-      },
-      {
-        id: 11,
-        user: "Citizen #3895",
-        service: "Health Office",
-        text: "The new chairs are nice, but the ventilation is still an issue.",
-        sentiment: "Neutral",
-        time: "4 days ago",
-        impact: "Facilities"
-      },
-      {
-        id: 12,
-        user: "Citizen #3901",
-        service: "Assessor",
-        text: "Very professional staff and clear instructions.",
-        sentiment: "Positive",
-        time: "5 days ago",
-        impact: "Integrity"
-      }
-    ]
   },
   "30 Monthly": {
     kpi: [
@@ -302,37 +235,49 @@ const dashboardDatabase = {
       cc2: 78.20,
       cc3: 74.70,
     },
-    feedback: [
+  },
+};
+
+const feedback = {
+  feedback: [
       {
-        id: 101,
-        user: "Citizen #1024",
-        service: "BPLO",
-        text: "The online registration implemented this month saved me so much time. Great improvement!",
-        sentiment: "Positive",
-        time: "2 weeks ago",
-        impact: "Responsiveness"
+        id: 1,
+        user: "Citizen #4021",
+        service: "General Services",
+        text: "The wait time was too long and the office was too hot. Facilities need improvement.",
+        sentiment: "Negative",
+        time: "10:15 AM",
+        impact: "Low Responsiveness"
       },
       {
-        id: 102,
-        user: "Citizen #1105",
-        service: "General Services",
-        text: "Still hoping for better air-conditioning in the waiting area, but the queueing system is better.",
+        id: 2,
+        user: "Citizen #4025",
+        service: "Treasury",
+        text: "Processing was clear, but the staff seemed tired. Communication could be better.",
         sentiment: "Neutral",
-        time: "3 weeks ago",
+        time: "11:30 AM",
+        impact: "Communication"
+      },
+      {
+        id: 3,
+        user: "Citizen #4030",
+        service: "Health Office",
+        text: "Very helpful doctors, though the laboratory equipment looks old.",
+        sentiment: "Positive",
+        time: "1:45 PM",
         impact: "Facilities"
       },
       {
-        id: 103,
-        user: "Citizen #0988",
-        service: "Treasury",
-        text: "Transparency in fees is commendable. Very consistent with the Citizen's Charter.",
+        id: 4,
+        user: "Citizen #4032",
+        service: "Engineering",
+        text: "The fees were exactly as listed in the charter. Fair pricing.",
         sentiment: "Positive",
-        time: "1 month ago",
+        time: "3:00 PM",
         impact: "Costs"
       }
-    ]
-  },
-};
+  ]
+}
 
 // --- 2. ICON HELPER ---
 const getIcon = (name, size = 24) => {
@@ -759,54 +704,81 @@ const AdminOverview = () => {
           </div>
 
           {/* --- FULL WIDTH: FEEDBACK TABLE --- */}
-          <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-              <h3 className="text-lg font-bold text-slate-900 tracking-tight">Recent Feedback Activity</h3>
-              <span className="text-xs font-bold text-slate-500 bg-slate-200/50 px-3 py-1 rounded-full uppercase tracking-tight">
-                Live Feed
-              </span>
+          <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 overflow-hidden">
+            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
+              <div className="space-y-1">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">Recent Feedback Activity</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                  <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                  Live Citizen Responses
+                </p>
+              </div>
+              <div className="flex gap-2">
+              </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+
+            <div className="overflow-x-auto px-4 pb-4 mt-2">
+              <table className="w-full text-left border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="px-10 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">User / Citizen</th>
-                    <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Comment Excerpt</th>
-                    <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Sentiment</th>
-                    <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Timestamp</th>
-                    <th className="px-10 py-5"></th>
+                  <tr className="text-slate-400">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Citizen / User</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Feedback Detail</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Sentiment Analysis</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Impact Area</th>
+                    <th className="px-6 py-4 text-right"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {currentView.feedback.map((item) => (
-                    <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors">
-                      <td className="px-10 py-6">
-                        <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-[10px] border border-blue-100 shadow-sm">
-                            {item.user.split(' ').map(n => n[0]).join('')}
+                <tbody className="divide-y-0">
+                  {feedback.feedback.map((item) => (
+                    <tr key={item.id} className="group transition-all duration-300 hover:scale-[1.005]">
+                      {/* User Info */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
+                        <div className="flex items-center gap-4">
+                          <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-all">
+                            #{item.user.split('#')[1]}
                           </div>
-                          <span className="text-sm font-bold text-slate-700">{item.user}</span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-black text-slate-700">{item.user}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{item.service}</span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6 max-w-md">
-                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic truncate">
+
+                      {/* Comment Text */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm max-w-sm">
+                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
                           "{item.text}"
                         </p>
                       </td>
-                      <td className="px-6 py-6">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-[10px] font-black uppercase border ${
-                          item.sentiment === 'Positive' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
+
+                      {/* Sentiment Badge */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase border shadow-xs ${
+                          item.sentiment === 'Positive' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
+                          item.sentiment === 'Neutral' ? 'bg-slate-50 text-slate-600 border-slate-200' :
+                          'bg-rose-50 text-rose-700 border-rose-100'
                         }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${item.sentiment === 'Positive' ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            item.sentiment === 'Positive' ? 'bg-emerald-500' : 
+                            item.sentiment === 'Neutral' ? 'bg-slate-400' : 
+                            'bg-rose-500'
+                          }`} />
                           {item.sentiment}
                         </div>
+                        <p className="text-[9px] font-bold text-slate-400 mt-1 ml-1">{item.time}</p>
                       </td>
-                      <td className="px-6 py-6 text-xs font-bold text-slate-400 uppercase tracking-tight">
-                        {item.time}
+
+                      {/* Impact Area Label */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 group-hover:shadow-sm">
+                        <span className="px-3 py-1 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-lg uppercase tracking-tight group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
+                          {item.impact}
+                        </span>
                       </td>
-                      <td className="px-10 py-6 text-right">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all">
-                          <MoreHorizontal size={18} />
+
+                      {/* Action */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 group-hover:shadow-sm text-right">
+                        <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all hover:shadow-sm">
+                          <ChevronRight size={18} />
                         </button>
                       </td>
                     </tr>
@@ -814,13 +786,7 @@ const AdminOverview = () => {
                 </tbody>
               </table>
             </div>
-            <div className="px-10 py-4 bg-slate-50/30 border-t border-slate-100 text-center">
-              <button className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-[0.2em] transition-colors">
-                View Detailed Analytics →
-              </button>
-            </div>
           </div>
-
         </div>
       </div>
     </div>
