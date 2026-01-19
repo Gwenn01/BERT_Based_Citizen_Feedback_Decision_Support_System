@@ -123,6 +123,8 @@ def insert_summary(data):
         ))
 
         conn.commit()
+    
+        return period_id
 
     except Exception as e:
         conn.rollback()
