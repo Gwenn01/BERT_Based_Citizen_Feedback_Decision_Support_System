@@ -38,12 +38,12 @@ def home():
     return "Server is running"
 # -----------------------------------------------
 # insert summary manually
-today = date.today()
-generate_period_summary(
-    period_type="daily",
-    start_date=today,
-    end_date=today
-)
+# today = date.today()
+# generate_period_summary(
+#     period_type="daily",
+#     start_date=today,
+#     end_date=today
+# )
 
 # today = date.today()
 # start_date = today - timedelta(days=6)  # includes today (7 days total)
