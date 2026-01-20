@@ -115,7 +115,7 @@ def format_recent_feedback(rows):
             "service": row.get("service_type", "Unknown Service"),
             "sentiment": sentiment["label"],
             "text": row.get("comment", ""),
-            "time": format_time(row.get("service_date")),
+            "time": format_time(row.get("created_at")),
         })
 
     return {
