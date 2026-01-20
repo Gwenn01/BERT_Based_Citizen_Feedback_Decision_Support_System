@@ -1,8 +1,8 @@
 from flask import jsonify
 from model.get_summary import get_latest_summary
 from model.get_feedback import fetch_recent_feedback
-from server.controllers.mapper.admin_overview_mapper import format_dashboard_response, format_recent_feedback
-from server.controllers.mapper.service_performance_mapper import get_service_performance
+from controllers.mapper.admin_overview_mapper import format_dashboard_response, format_recent_feedback
+from controllers.mapper.service_performance_mapper import get_service_performance
 
 def get_admin_overview():
     try:

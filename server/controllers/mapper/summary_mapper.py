@@ -10,7 +10,7 @@ from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
 from ai.translator import translate_filipino_to_english
 from services.recommendations.recommendation_service import generate_decision_support
-from server.controllers.mapper.recommendation_mapper import save_recommendations
+from controllers.mapper.recommendation_mapper import save_recommendations
 
 def generate_period_summary(period_type, start_date, end_date):
     # 1. Get feedback

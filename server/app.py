@@ -5,7 +5,7 @@ from model.run_tests import run_model_tests
 from controllers.run_tests import run_controller_tests
 from services.run_tests import run_services_tests
 from services.scheduler.run_summary import start_scheduler
-from server.controllers.mapper.summary_mapper import generate_period_summary
+from controllers.mapper.summary_mapper import generate_period_summary
 
 # -------------------------------------------------
 # Flask Initialization

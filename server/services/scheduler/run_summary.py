@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import date, timedelta
 
-from server.controllers.mapper.summary_mapper import generate_period_summary
+from controllers.mapper.summary_mapper import generate_period_summary
 
 
 def run_daily_summary():
