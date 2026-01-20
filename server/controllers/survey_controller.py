@@ -2,7 +2,7 @@
 from flask import request, jsonify
 from model.insert_feedback import insert_feedback
 from middlewares.validate_feedback import validate_feedback
-from controllers.handle_feedback_data import get_service_id
+from server.controllers.mapper.handle_feedback_data import get_service_id
 
 def handle_survey_submission():
     try:
