@@ -44,7 +44,7 @@ def fetch_recent_feedback():
         SELECT *
         FROM feedback
         ORDER BY created_at DESC
-        LIMIT 3
+        LIMIT 5
     """)
 
     feedback = cursor.fetchall()

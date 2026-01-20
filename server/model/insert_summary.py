@@ -21,12 +21,12 @@ def insert_summary(data):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    if period_exists(
-    data["period"]["type"],
-        data["period"]["start_date"],
-        data["period"]["end_date"]
-    ):
-        return  # already exists, skip insertion
+    # if period_exists(
+    # data["period"]["type"],
+    #     data["period"]["start_date"],
+    #     data["period"]["end_date"]
+    # ):
+    #     return  # already exists, skip insertion
 
 
     try:

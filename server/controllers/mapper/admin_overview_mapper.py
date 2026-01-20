@@ -1,5 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
+from ai.translator import translate_filipino_to_english
+from ai.bert_model import predict_sentiment
 
 def format_dashboard_response(row):
     if not row:
@@ -106,10 +108,12 @@ def format_recent_feedback(rows):
     formatted = []
 
     for row in rows:
+        sentiment = predict_sentiment( translate_filipino_to_english(row.get("comment", "")) )
         formatted.append({
             "id": row["feedback_id"],
             "client": row["client_type"],
             "service": row.get("service_type", "Unknown Service"),
+            "sentiment": sentiment["label"],
             "text": row.get("comment", ""),
             "time": format_time(row.get("service_date")),
         })

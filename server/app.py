@@ -5,7 +5,7 @@ from model.run_tests import run_model_tests
 from controllers.run_tests import run_controller_tests
 from services.run_tests import run_services_tests
 from services.scheduler.run_summary import start_scheduler
-from server.controllers.mapper.generate_summary_mapper import generate_period_summary
+from controllers.mapper.generate_summary_mapper import generate_period_summary
 
 # -------------------------------------------------
 # Flask Initialization
@@ -37,13 +37,14 @@ app.register_blueprint(admin_overview_bp, url_prefix="/api")
 def home():
     return "Server is running"
 # -----------------------------------------------
-# insert summary manually
+#insert summary manually
 # today = date.today()
 # generate_period_summary(
 #     period_type="daily",
 #     start_date=today,
 #     end_date=today
 # )
+# print("generated sucess")
 
 # today = date.today()
 # start_date = today - timedelta(days=6)  # includes today (7 days total)
@@ -69,4 +70,12 @@ if __name__ == "__main__":
     run_controller_tests()
     run_services_tests()
     start_scheduler()
+    today = date.today()
+    
+    generate_period_summary(
+        period_type="daily",
+        start_date=today,
+        end_date=today
+    )
+    print("generated suces")
     app.run(debug=True)

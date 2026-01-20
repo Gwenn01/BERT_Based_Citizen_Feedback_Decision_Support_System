@@ -1,6 +1,7 @@
 from ai.bert_model import predict_sentiment
 from ai.translator import translate_filipino_to_english
 
+
 from services.summary_result.survey_agent import analyze_survey
 from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
@@ -30,8 +31,15 @@ def run_services_tests():
     # "Sobrang bilis at napakabait ng staff. Excellent serbisyo!",
     # "Okay lang ang proseso, walang problema."
     # ]
-    # for t in feedback:
-    #     print(translate_filipino_to_english(t["comment"]), "=>", predict_sentiment( translate_filipino_to_english(t["comment"]) ) )
+    # print(f"Test Comment:")
+    
+    # print(tests[0])
+    # print(tests[1])
+    # print(tests[2])
+    # print(end="")
+    # print("Converting tagalog comment into english:")
+    # for t in tests:
+    #     print(translate_filipino_to_english(t), "=>", predict_sentiment( translate_filipino_to_english(t) ) )
     
     
     # for f in feedback:
@@ -64,4 +72,13 @@ def run_services_tests():
     
     # recommendation = generate_decision_support(data)
     # print(recommendation)
+    
+    
+    
+
+    # print(predict_sentiment("Very rude and very slow service"))
+    # print(predict_sentiment("Very fast and very kind staff"))
+    # print(predict_sentiment("The process is okay, no problem"))
+
+    
     print("Running services tests...")
