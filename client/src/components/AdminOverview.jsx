@@ -153,7 +153,7 @@ const AdminOverview = () => {
       {/* KPI Cards Skeleton */}
       <div className="grid grid-cols-4 gap-8">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-32 bg-slate-200 rounded-[2rem] animate-pulse" />
+          <div key={i} className="h-32 bg-slate-200 rounded-4xl animate-pulse" />
         ))}
       </div>
 
