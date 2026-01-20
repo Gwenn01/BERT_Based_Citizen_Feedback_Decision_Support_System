@@ -162,7 +162,7 @@ const AiInsights = () => {
 
       {/* --- STRATEGIC PLAYBOOK --- */}
       <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/5">
-        {/* Header Section */}
+
         <div className="px-10 py-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-linear-to-r from-slate-50/50 to-white">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-amber-50 rounded-2xl shadow-inner group">
@@ -195,7 +195,6 @@ const AiInsights = () => {
               key={idx} 
               className={`p-10 group relative transition-all duration-500 hover:bg-slate-50/80 cursor-pointer border-r border-b border-slate-100 last:border-r-0`}
             >
-              {/* Step Indicator background effect */}
               <span className="absolute top-8 right-10 text-6xl font-black text-slate-50 group-hover:text-slate-100 transition-colors pointer-events-none">
                 0{idx + 1}
               </span>

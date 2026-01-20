@@ -415,7 +415,6 @@ const ServicePerformance = () => {
                   {/* Feedback Volume - MODERN ACTIVITY LOOK */}
                   <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-300">
                     <div className="flex items-center gap-4">
-                      {/* Visual Activity Indicator (Micro-chart) */}
                       <div className="flex items-end gap-0.5 h-8 w-10 pb-1">
                         {[0.4, 0.7, 0.5, 0.9, 0.6].map((h, i) => (
                           <div 

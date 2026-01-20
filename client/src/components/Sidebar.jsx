@@ -44,12 +44,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       <div className="p-6 border-b border-slate-800">
         <div className="flex flex-col items-center text-center group">
           
-          {/* LOGO CONTAINER - Perfectly Circular */}
           <div className="relative mb-4">
-            {/* Background Glow Effect */}
             <div className="absolute -inset-2 bg-blue-600/20 rounded-full blur-xl group-hover:bg-blue-600/30 transition duration-500 opacity-70"></div>
             
-            {/* The Image Circle */}
             <div className="relative w-24 h-24 rounded-full border-2 border-slate-700 p-1 bg-slate-900 group-hover:border-blue-500 transition-colors duration-500 overflow-hidden">
               <img 
                 src="/lgu-iba-logo.jpg" 
@@ -59,7 +56,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             </div>
           </div>
 
-          {/* TEXT SECTION */}
           <div className="space-y-1.5">
             <h1 className="text-white font-black text-sm leading-tight tracking-[0.05em] uppercase">
               Municipality of Iba
@@ -74,7 +70,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         </div>
       </div>
 
-      {/* Navigation Links */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         {menuItems.map((item) => (
           <button
@@ -102,7 +97,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         ))}
       </nav>
 
-      {/* User / Footer Section */}
       <div className="p-4 mt-auto border-t border-slate-800">
         <div className="bg-slate-800/50 rounded-xl p-3 flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">

@@ -299,7 +299,6 @@ const AdminOverview = () => {
                       animationDuration={1500}
                     >
                       {currentView.sentiment.map((entry, index) => {
-                        // Logic para sa Cell Colors
                         const cellColor = entry.name === "Positive" ? "#10b981" : 
                                         entry.name === "Neutral" ? "#f59e0b" : 
                                         "#f43f5e";
@@ -472,13 +471,10 @@ const AdminOverview = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">
                     Avg Score
                   </span>
-                  {/* Ginagamit ang overall awareness score mula sa database */}
                   <span className="text-sm font-black text-slate-900">
                     {currentView.charter_awareness.overall}%
                   </span>
                 </div>
-
-                {/* Kinukuha ang trend value (+3.56%, Moderate, etc.) mula sa KPI array */}
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     currentView.kpi[0].trend.includes("+") ||
