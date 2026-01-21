@@ -6,7 +6,7 @@ from controllers.run_tests import run_controller_tests
 from services.run_tests import run_services_tests
 from services.scheduler.run_summary import start_scheduler
 from controllers.mapper.generate_summary_mapper import generate_period_summary
-
+#from controllers.mapper.genarate_service_performance_mapper import get_service_performance
 # -------------------------------------------------
 # Flask Initialization
 # -------------------------------------------------
@@ -74,7 +74,8 @@ if __name__ == "__main__":
     run_controller_tests()
     run_services_tests()
     start_scheduler()
-    
+    # aware to uncomments
+    # print(get_service_performance())
     # today = date.today()
     # generate_period_summary(
     #     period_type="daily",

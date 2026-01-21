@@ -28,6 +28,14 @@ def get_service_performance():
             "sentiment_analysis": round(feedback_sentiment["sentiment_score"],),
             "total_feedback_count": len(feedback_by_service)
         }
+        for office_name, metrics in data.items():
+            insert_service_performance({
+                "office_name": office_name,
+                "citizens_charter_awareness": metrics["citizens_charter_awareness"],
+                "survey_analysis": metrics["survey_analysis"],
+                "sentiment_analysis": metrics["sentiment_analysis"],
+                "total_feedback_count": metrics["total_feedback_count"]
+            })
     return data
     
         

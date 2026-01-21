@@ -3,7 +3,6 @@ from datetime import date, timedelta
 
 from controllers.mapper.generate_summary_mapper import generate_period_summary
 from controllers.mapper.genarate_service_performance_mapper import get_service_performance
-from model.insert_office_performance import insert_service_performance
 
 
 def start_scheduler():
@@ -42,15 +41,8 @@ def run_monthly_summary():
         start_date=start_date,
         end_date=today
     )
-    data = get_service_performance()
-    for office_name, metrics in data.items():
-        insert_service_performance({
-            "office_name": office_name,
-            "citizens_charter_awareness": metrics["citizens_charter_awareness"],
-            "survey_analysis": metrics["survey_analysis"],
-            "sentiment_analysis": metrics["sentiment_analysis"],
-            "total_feedback_count": metrics["total_feedback_count"]
-        })
+    get_service_performance()
+   
 
 
 def start_scheduler():

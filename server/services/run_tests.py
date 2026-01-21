@@ -79,4 +79,4 @@ def run_services_tests():
     # print(predict_sentiment("The process is okay, no problem"))
 
     
-    print("Running services tespythonts...")
+    print("Running services services...")

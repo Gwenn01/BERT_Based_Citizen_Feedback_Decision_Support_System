@@ -2,6 +2,7 @@ from flask import jsonify
 from model.get_summary import get_latest_summary
 from model.get_feedback import fetch_recent_feedback
 from model.get_recommendations import get_recommendations
+from model.get_office_peroformance import get_all_office_performance
 from controllers.mapper.admin_overview_mapper import format_dashboard_response, format_recent_feedback
 from controllers.mapper.genarate_service_performance_mapper import get_service_performance
 from controllers.mapper.admin_service_performance_mapper import admin_service_performance_mapper
@@ -40,8 +41,8 @@ def get_recent_feedback_overview():
 
 def get_admin_service_performance():
     try:
-        service_performance = get_service_performance()
-        format_data =admin_service_performance_mapper(service_performance)
+        office_performance = get_all_office_performance()
+        format_data =admin_service_performance_mapper(office_performance)
         return jsonify(format_data), 200
     except Exception as e:
         return jsonify({
