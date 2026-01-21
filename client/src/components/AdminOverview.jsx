@@ -677,91 +677,188 @@ const AdminOverview = () => {
               </div>
             </div>
 
-            <div className="overflow-x-auto px-4 pb-4 mt-2">
-              <table className="w-full text-left border-separate border-spacing-y-2">
-                <thead>
-                  <tr className="text-slate-400">
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Citizen / User
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Feedback Detail
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Service Area
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Timestamp
-                    </th>
-                    <th className="px-6 py-4 text-right"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y-0">
-                  {feedbackData.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="group transition-all duration-300 hover:scale-[1.005]"
-                    >
-                      {/* User / Client Info */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100">
-                        <div className="flex items-center gap-4">
-                          <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm">
-                            #{item.id}
+            <div className="px-4 pb-4 mt-2 w-full overflow-hidden">
+            <table className="w-full text-left border-separate border-spacing-y-2 table-auto">
+              <thead>
+                <tr className="text-slate-400">
+                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Citizen / User
+                  </th>
+                  <th className="w-[25%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Feedback Detail
+                  </th>
+                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Service Area
+                  </th>
+                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Bert Sentiment Analysis
+                  </th>
+                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Timestamp
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y-0">
+                {feedbackData.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="group transition-all duration-300 hover:scale-[1.005]"
+                  >
+                    {/* User / Client Info */}
+                    <td className="px-6 py-5 bg-slate-50/40 group-hover:bg-white rounded-l-4xl border-y border-l border-transparent group-hover:border-slate-200/60 transition-all duration-300">
+                      <div className="flex items-center gap-4 min-w-0">
+                        {/* Avatar Section */}
+                        <div className="relative shrink-0 group-hover:scale-105 transition-transform duration-300">
+                          <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-200/40">
+                            <span className="text-white font-bold text-sm tracking-widest">
+                              {item.client ? item.client.charAt(0).toUpperCase() : "G"}
+                            </span>
                           </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-black text-slate-700">
-                              {item.client || "Anonymous"}
-                            </span>
-                            <span className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">
-                              ID: {item.id}
-                            </span>
+                          <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-white border border-slate-100 rounded-lg flex items-center justify-center shadow-sm">
+                            <span className="text-[8px] font-black text-slate-400">#{item.id}</span>
                           </div>
                         </div>
-                      </td>
 
-                      {/* Feedback Text */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 max-w-sm">
-                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
-                          "{item.text}"
-                        </p>
-                      </td>
+                        {/* Info Section */}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[15px] font-black text-slate-800 tracking-tight mb-1 group-hover:text-blue-700 transition-colors whitespace-nowrap">
+                            {item.client || "General Public"}
+                          </span>
+                          <div className="flex flex-col leading-tight">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                              Verified User
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[9px] font-medium text-slate-400 uppercase">Ref:</span>
+                              <span className="text-[9px] font-black text-indigo-500 uppercase tracking-tighter">
+                                {item.id}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
-                      {/* Service Type */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
-                        <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
-                          {item.service}
-                        </span>
-                      </td>
-                      {/* sentiment Type */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
-                        <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                    {/* Feedback Text Column */}
+                    <td className="px-8 py-6 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-300">
+                      <div className="relative flex flex-col gap-3 min-w-0">
+                        <div className="relative z-10">
+                          <p className="text-[14px] text-slate-600 font-semibold leading-relaxed tracking-tight group-hover:text-slate-900 transition-colors duration-300">
+                            <span className="text-blue-500/40 font-serif text-lg mr-1 group-hover:text-blue-500 transition-colors">“</span>
+                            {item.text}
+                            <span className="text-blue-500/40 font-serif text-lg ml-1 group-hover:text-blue-500 transition-colors">”</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="h-0.5 w-4 bg-slate-200 group-hover:w-8 group-hover:bg-blue-400 transition-all duration-500" />
+                          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-300 group-hover:text-blue-500 transition-colors">
+                            Full Citizen Testimony
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-500">
+                    <div className="flex flex-col gap-1.5">
+                      {/* Label Header - Small detail that adds professionalism */}
+                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.25em] pl-1">
+                        Department
+                      </span>
+
+                      <div className="flex items-center gap-3">
+                        {/* Premium Indicator: Mas malinis na Pulse at Glow */}
+                        <div className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-30"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.6)]"></span>
+                        </div>
+
+                        {/* Modern Badge Style */}
+                        <div className="relative group/badge">
+                          <span className="
+                            inline-flex items-center px-3.5 py-1.5 
+                            bg-white/80 backdrop-blur-sm 
+                            border border-slate-200/80 
+                            text-[11px] font-black text-slate-700 
+                            rounded-xl uppercase tracking-wider
+                            shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)]
+                            group-hover:border-indigo-300 group-hover:text-indigo-700 
+                            group-hover:shadow-indigo-100/50
+                            transition-all duration-300 whitespace-nowrap
+                          ">
+                            {item.service}
+                          </span>
+                          
+                          {/* Subtle Bottom Glow on Hover */}
+                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-px bg-linear-to-r from-transparent via-indigo-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                   <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-500">
+                    <div className="flex items-center">
+                      {/* Premium Floating Badge */}
+                      <div className={`
+                        relative flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-500
+                        ${item.sentiment?.toLowerCase() === 'positive' 
+                          ? 'bg-emerald-50/30 border-emerald-200/50 text-emerald-700 shadow-[0_4px_12px_-2px_rgba(16,185,129,0.12)]' 
+                          : 'bg-rose-50/30 border-rose-200/50 text-rose-700 shadow-[0_4px_12px_-2px_rgba(244,63,94,0.12)]'
+                        }
+                        group-hover:-translate-y-px group-hover:shadow-md
+                      `}>
+                        
+                        {/* Precision Status Indicator */}
+                        <div className="relative flex h-2 w-2">
+                          <span className={`
+                            absolute inline-flex h-full w-full rounded-full opacity-40 animate-pulse
+                            ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-400' : 'bg-rose-400'}
+                          `}></span>
+                          <span className={`
+                            relative inline-flex rounded-full h-2 w-2 
+                            ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-500' : 'bg-rose-500'}
+                          `}></span>
+                        </div>
+
+                        {/* Typography: Clean and High-Tracking */}
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em] antialiased">
                           {item.sentiment}
                         </span>
-                      </td>
 
-                      {/* Time Received */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-500">
-                            {item.time}
-                          </span>
-                          <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest">
-                            Received
-                          </span>
+                        {/* Subtle Inner Glow - makes it look 3D/Glassy */}
+                        <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-white/40 to-transparent pointer-events-none" />
+                      </div>
+                    </div>
+                  </td>
+
+                    {/* Time Received Column */}
+                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-4xl border-y border-r border-transparent group-hover:border-slate-200/60 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center gap-1 shrink-0">
+                          <div className="h-1.5 w-1.5 rounded-full bg-blue-500/20 group-hover:bg-blue-500 transition-colors duration-500" />
+                          <div className="h-8 w-px bg-slate-200 group-hover:bg-blue-100 transition-colors duration-500" />
                         </div>
-                      </td>
 
-                      {/* Action */}
-                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 text-right">
-                        <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all">
-                          <ChevronRight size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <div className="flex flex-col justify-center min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <svg className="w-3 h-3 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m4-2a8 8 0 11-16 0 8 8 0 0116 0z" />
+                            </svg>
+                            <span className="text-[13px] font-black text-slate-700 tracking-tight tabular-nums group-hover:text-slate-900 transition-colors truncate">
+                              {item.time}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[9px] text-slate-400 uppercase font-black tracking-[0.15em]">Received</span>
+                            <span className="px-1.5 py-0.5 bg-slate-100 rounded text-[8px] font-bold text-slate-500 uppercase group-hover:bg-blue-50 group-hover:text-blue-600">Live</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           </div>
         </div>
       </div>
