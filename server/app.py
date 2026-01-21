@@ -70,12 +70,12 @@ if __name__ == "__main__":
     run_controller_tests()
     run_services_tests()
     start_scheduler()
-    today = date.today()
     
-    generate_period_summary(
-        period_type="daily",
-        start_date=today,
-        end_date=today
-    )
-    print("generated suces")
+    # today = date.today()
+    # generate_period_summary(
+    #     period_type="daily",
+    #     start_date=today,
+    #     end_date=today
+    # )
+    # print("generated suces")
     app.run(debug=True)

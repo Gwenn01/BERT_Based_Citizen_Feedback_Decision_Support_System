@@ -114,7 +114,7 @@ const AdminOverview = () => {
   const [activeFilter, setActiveFilter] = useState("1 Daily");
   const [dashboardDatabase, setDashboardDatabase] = useState({});
   const [feedbackData, setFeedbackData] = useState([]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -123,7 +123,7 @@ const AdminOverview = () => {
         setLoading(true);
         const [dashRes, feedbackRes] = await Promise.all([
           axios.get("http://127.0.0.1:5000/api/dashboard"),
-          axios.get("http://127.0.0.1:5000/api/recent-feedback")
+          axios.get("http://127.0.0.1:5000/api/recent-feedback"),
         ]);
 
         setDashboardDatabase(dashRes.data);
@@ -139,32 +139,35 @@ const AdminOverview = () => {
   }, []);
 
   if (loading) {
-  return (
-    <div className="min-h-screen bg-slate-50/50 p-8 space-y-10">
-      {/* Header Skeleton */}
-      <div className="flex justify-between items-center animate-pulse">
-        <div className="space-y-3">
-          <div className="h-8 w-64 bg-slate-200 rounded-lg" />
-          <div className="h-4 w-40 bg-slate-200 rounded-lg" />
+    return (
+      <div className="min-h-screen bg-slate-50/50 p-8 space-y-10">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center animate-pulse">
+          <div className="space-y-3">
+            <div className="h-8 w-64 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-40 bg-slate-200 rounded-lg" />
+          </div>
+          <div className="h-12 w-48 bg-slate-200 rounded-2xl" />
         </div>
-        <div className="h-12 w-48 bg-slate-200 rounded-2xl" />
-      </div>
-      
-      {/* KPI Cards Skeleton */}
-      <div className="grid grid-cols-4 gap-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-32 bg-slate-200 rounded-4xl animate-pulse" />
-        ))}
-      </div>
 
-      {/* Main Content Skeleton */}
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-4 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
-        <div className="col-span-8 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
+        {/* KPI Cards Skeleton */}
+        <div className="grid grid-cols-4 gap-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-32 bg-slate-200 rounded-4xl animate-pulse"
+            />
+          ))}
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-4 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
+          <div className="col-span-8 h-96 bg-slate-200 rounded-[2.5rem] animate-pulse" />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (error) {
     return (
@@ -172,9 +175,13 @@ const AdminOverview = () => {
         <div className="bg-red-50 text-red-600 p-4 rounded-3xl border border-red-100 mb-4">
           <Activity size={40} />
         </div>
-        <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">System Offline</h2>
-        <p className="text-slate-500 text-sm max-w-xs mb-6 font-medium">{error}</p>
-        <button 
+        <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">
+          System Offline
+        </h2>
+        <p className="text-slate-500 text-sm max-w-xs mb-6 font-medium">
+          {error}
+        </p>
+        <button
           onClick={() => window.location.reload()}
           className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all"
         >
@@ -284,11 +291,14 @@ const AdminOverview = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={currentView.sentiment.map(s => ({
+                      data={currentView.sentiment.map((s) => ({
                         ...s,
-                        color: s.name === "Positive" ? "#10b981" :
-                              s.name === "Neutral" ? "#f59e0b" :  
-                              "#f43f5e"                         
+                        color:
+                          s.name === "Positive"
+                            ? "#10b981"
+                            : s.name === "Neutral"
+                              ? "#f59e0b"
+                              : "#f43f5e",
                       }))}
                       innerRadius={80}
                       outerRadius={100}
@@ -299,9 +309,12 @@ const AdminOverview = () => {
                       animationDuration={1500}
                     >
                       {currentView.sentiment.map((entry, index) => {
-                        const cellColor = entry.name === "Positive" ? "#10b981" : 
-                                        entry.name === "Neutral" ? "#f59e0b" : 
-                                        "#f43f5e";
+                        const cellColor =
+                          entry.name === "Positive"
+                            ? "#10b981"
+                            : entry.name === "Neutral"
+                              ? "#f59e0b"
+                              : "#f43f5e";
                         return (
                           <Cell
                             key={`cell-${index}`}
@@ -319,7 +332,9 @@ const AdminOverview = () => {
                             <div className="bg-slate-900 px-3 py-2 rounded-xl shadow-xl border border-slate-800">
                               <p className="text-[10px] font-black text-white uppercase tracking-widest">
                                 {payload[0].name}:{" "}
-                                <span style={{ color: payload[0].payload.color }}>
+                                <span
+                                  style={{ color: payload[0].payload.color }}
+                                >
                                   {payload[0].value}%
                                 </span>
                               </p>
@@ -335,7 +350,9 @@ const AdminOverview = () => {
                 {/* Center Label - Dynamic Color based on dominant sentiment */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
-                    {currentView.sentiment.find((s) => s.name === "Positive")?.value || 0}%
+                    {currentView.sentiment.find((s) => s.name === "Positive")
+                      ?.value || 0}
+                    %
                   </span>
                   <div className="flex items-center gap-1 mt-1">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
@@ -349,13 +366,19 @@ const AdminOverview = () => {
               {/* Legend Grid - Modern Pill Style with Dynamic Colors */}
               <div className="grid grid-cols-3 gap-3 mt-8 w-full pt-6 border-t border-slate-50">
                 {currentView.sentiment.map((s) => {
-                  const activeColor = s.name === "Positive" ? "text-emerald-500" : 
-                                      s.name === "Neutral" ? "text-amber-500" : 
-                                      "text-rose-500";
-                  const dotColor = s.name === "Positive" ? "bg-emerald-500" : 
-                                  s.name === "Neutral" ? "bg-amber-500" : 
-                                  "bg-rose-500";
-                  
+                  const activeColor =
+                    s.name === "Positive"
+                      ? "text-emerald-500"
+                      : s.name === "Neutral"
+                        ? "text-amber-500"
+                        : "text-rose-500";
+                  const dotColor =
+                    s.name === "Positive"
+                      ? "bg-emerald-500"
+                      : s.name === "Neutral"
+                        ? "bg-amber-500"
+                        : "bg-rose-500";
+
                   return (
                     <div
                       key={s.name}
@@ -641,78 +664,105 @@ const AdminOverview = () => {
           </div>
 
           <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
-          {/* Table Header Section */}
-          <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
-            <div className="space-y-1">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Recent Feedback Activity</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                Live Citizen Responses
-              </p>
+            {/* Table Header Section */}
+            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
+              <div className="space-y-1">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                  Recent Feedback Activity
+                </h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                  <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                  Live Citizen Responses
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto px-4 pb-4 mt-2">
+              <table className="w-full text-left border-separate border-spacing-y-2">
+                <thead>
+                  <tr className="text-slate-400">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                      Citizen / User
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                      Feedback Detail
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                      Service Area
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                      Timestamp
+                    </th>
+                    <th className="px-6 py-4 text-right"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y-0">
+                  {feedbackData.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="group transition-all duration-300 hover:scale-[1.005]"
+                    >
+                      {/* User / Client Info */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100">
+                        <div className="flex items-center gap-4">
+                          <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm">
+                            #{item.id}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-black text-slate-700">
+                              {item.client || "Anonymous"}
+                            </span>
+                            <span className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">
+                              ID: {item.id}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Feedback Text */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 max-w-sm">
+                        <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
+                          "{item.text}"
+                        </p>
+                      </td>
+
+                      {/* Service Type */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
+                        <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                          {item.service}
+                        </span>
+                      </td>
+                      {/* sentiment Type */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
+                        <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                          {item.sentiment}
+                        </span>
+                      </td>
+
+                      {/* Time Received */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-500">
+                            {item.time}
+                          </span>
+                          <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest">
+                            Received
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Action */}
+                      <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 text-right">
+                        <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all">
+                          <ChevronRight size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-
-          <div className="overflow-x-auto px-4 pb-4 mt-2">
-            <table className="w-full text-left border-separate border-spacing-y-2">
-              <thead>
-                <tr className="text-slate-400">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Citizen / User</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Feedback Detail</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Service Area</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Timestamp</th>
-                  <th className="px-6 py-4 text-right"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y-0">
-                {feedbackData.map((item) => (
-                  <tr key={item.id} className="group transition-all duration-300 hover:scale-[1.005]">
-                    {/* User / Client Info */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-3xl border-y border-l border-transparent group-hover:border-slate-100">
-                      <div className="flex items-center gap-4">
-                        <div className="h-11 w-11 rounded-2xl bg-white border border-slate-100 text-blue-600 flex items-center justify-center font-black text-[10px] shadow-sm">
-                          #{item.id}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-slate-700">{item.client || "Anonymous"}</span>
-                          <span className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">ID: {item.id}</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Feedback Text */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 max-w-sm">
-                      <p className="text-sm text-slate-600 font-medium leading-relaxed italic line-clamp-2">
-                        "{item.text}"
-                      </p>
-                    </td>
-
-                    {/* Service Type */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
-                      <span className="px-3 py-1.5 bg-white border border-slate-200 text-[10px] font-black text-slate-500 rounded-xl uppercase tracking-tight group-hover:text-blue-600 transition-colors">
-                        {item.service}
-                      </span>
-                    </td>
-
-                    {/* Time Received */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-slate-500">{item.time}</span>
-                        <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest">Received</span>
-                      </div>
-                    </td>
-
-                    {/* Action */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-3xl border-y border-r border-transparent group-hover:border-slate-100 text-right">
-                      <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all">
-                        <ChevronRight size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
         </div>
       </div>
     </div>
