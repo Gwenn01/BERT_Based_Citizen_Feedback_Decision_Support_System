@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   BarChart3,
   TrendingDown,
@@ -22,23 +22,49 @@ import {
   LabelList,
 } from "recharts";
 import axios from "axios";
-import { useState } from "react";
+
+const SkeletonLoader = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10 animate-pulse">
+    {/* Header Skeleton */}
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-200 pb-8">
+      <div className="space-y-3">
+        <div className="h-9 w-64 bg-slate-200 rounded-lg" />
+        <div className="h-5 w-96 bg-slate-100 rounded-md" />
+      </div>
+    </div>
+
+    {/* Cards Skeleton */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+      {[1, 2].map((i) => (
+        <div key={i} className="h-45 bg-slate-50 rounded-[3rem] border border-slate-100 p-8 flex justify-between items-center">
+          <div className="space-y-4 flex-1">
+            <div className="h-4 w-24 bg-slate-200 rounded" />
+            <div className="space-y-2">
+              <div className="h-8 w-full bg-slate-200 rounded-lg" />
+              <div className="h-4 w-32 bg-slate-100 rounded" />
+            </div>
+          </div>
+          <div className="w-20 h-20 bg-slate-200 rounded-4xl ml-4" />
+        </div>
+      ))}
+    </div>
+
+    {/* Chart Skeleton */}
+    <div className="h-125 bg-slate-50 rounded-[3rem] border border-slate-100 p-10">
+      <div className="h-6 w-48 bg-slate-200 rounded mb-12" />
+      <div className="space-y-6">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex items-center gap-4">
+            <div className="h-4 w-32 bg-slate-200 rounded" />
+            <div className="h-6 flex-1 bg-slate-100 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const ServicePerformance = () => {
-  /*
-  const serviceData = [
-    { name: "Sangguniang Bayan", rating: 4.2, volume: 120, negative: 10, cc_awareness: 0.85 },
-    { name: "Assessor's Office", rating: 3.8, volume: 450, negative: 25, cc_awareness: 0.72 },
-    { name: "Engineering Office", rating: 3.5, volume: 380, negative: 30, cc_awareness: 0.65 },
-    { name: "Agricultural Services", rating: 4.5, volume: 210, negative: 5, cc_awareness: 0.92 },
-    { name: "Youth Development", rating: 4.7, volume: 180, negative: 2, cc_awareness: 0.98 },
-    { name: "MSWDO", rating: 2.9, volume: 520, negative: 48, cc_awareness: 0.58 },
-    { name: "Irene Maniquiz Center", rating: 4.9, volume: 600, negative: 1, cc_awareness: 0.99 },
-    { name: "Treasury Office", rating: 3.2, volume: 850, negative: 35, cc_awareness: 0.68 },
-    { name: "Civil Registry", rating: 4.1, volume: 420, negative: 12, cc_awareness: 0.88 },
-    { name: "Health Services", rating: 4.8, volume: 950, negative: 4, cc_awareness: 0.95 },
-  ];
-  */
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,18 +87,18 @@ const ServicePerformance = () => {
     fetchServicePerformance();
   }, []);
 
-  if (loading) return <p>Loading service performance...</p>;
+  const highestRated = useMemo(() => {
+    if (!serviceData || serviceData.length === 0) return null;
+    return [...serviceData].sort((a, b) => b.rating - a.rating)[0];
+  }, [serviceData]);
+
+  const highestNegative = useMemo(() => {
+    if (!serviceData || serviceData.length === 0) return null;
+    return [...serviceData].sort((a, b) => b.negative - a.negative)[0];
+  }, [serviceData]);
+  
+  if (loading) return <SkeletonLoader />;
   if (error) return <p>{error}</p>;
-
-  const highestRated =
-    serviceData.length > 0
-      ? [...serviceData].sort((a, b) => b.rating - a.rating)[0]
-      : null;
-
-  const highestNegative =
-    serviceData.length > 0
-      ? [...serviceData].sort((a, b) => b.negative - a.negative)[0]
-      : null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10 animate-in fade-in duration-700">
@@ -88,32 +114,13 @@ const ServicePerformance = () => {
             satisfaction.
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              size={16}
-            />
-            <select className="pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer shadow-sm">
-              <option>All Departments</option>
-              {serviceData.map((s) => (
-                <option key={s.name}>{s.name}</option>
-              ))}
-            </select>
-            <Filter
-              size={14}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-            />
-          </div>
-        </div>
       </div>
 
       {/* --- TOP RANKING CARDS --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         {/* Highest Rated Card */}
         <div className="bg-linear-to-br from-emerald-50 via-white to-white p-8 rounded-[3rem] border border-emerald-100 shadow-xl shadow-emerald-500/5 flex items-center justify-between group hover:border-emerald-200 transition-all duration-500">
-          <div className="space-y-4">
+          <div className="space-y-4 flex-1 pr-4">
             <div className="flex items-center gap-2.5 text-emerald-600">
               <div className="p-2 bg-emerald-100 rounded-xl">
                 <Award size={20} className="animate-bounce" />
@@ -142,7 +149,7 @@ const ServicePerformance = () => {
         </div>
 
         {/* Action Required Card */}
-        <div className="bg-linear-to-br from-rose-50 via-white to-white p-8 rounded-[3rem] border border-rose-100 shadow-xl shadow-rose-500/5 flex items-center justify-between group hover:border-rose-200 transition-all duration-500">
+        <div className="bg-linear-to-br from-rose-50 via-white to-white p-8 rounded-[3rem] border border-rose-100 shadow-xl shadow-rose-500/5 flex items-center justify-between group hover:border-rose-200 transition-all duration-500 min-h-45">
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 text-rose-600">
               <div className="p-2 bg-rose-100 rounded-xl">
