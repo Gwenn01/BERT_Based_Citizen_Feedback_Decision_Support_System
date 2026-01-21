@@ -2,6 +2,7 @@ from services.summary_result.survey_agent import analyze_survey
 from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
 from model.get_services import get_services, get_feedback_by_service
+from model.insert_office_performance import insert_service_performance
 
 def get_service_performance():
     data = {}
@@ -22,13 +23,12 @@ def get_service_performance():
         feedback_survey_avg = analyze_survey(feedback_by_service)
         feedback_sentiment = analyze_sentiment(comments)
         data[s['service_name']] = {
-            "citizens_charter_awareness": feedback_cc_avg["overall_awareness"],
-            "survey_analysis": feedback_survey_avg["overall_avg"],
-            "sentiment_analysis": feedback_sentiment["sentiment_score"],
+            "citizens_charter_awareness": round(feedback_cc_avg["overall_awareness"],),
+            "survey_analysis": round(feedback_survey_avg["overall_avg"], 2),
+            "sentiment_analysis": round(feedback_sentiment["sentiment_score"],),
             "total_feedback_count": len(feedback_by_service)
         }
-    print("Service Performance Data:", data)
-    return data  
+    return data
     
         
     
