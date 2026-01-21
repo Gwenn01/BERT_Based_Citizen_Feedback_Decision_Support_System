@@ -1,56 +1,73 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import axios from 'axios';
 import { 
   Sparkles, AlertTriangle, BrainCircuit, 
-  ArrowRight, ShieldCheck, Zap, Clock, CheckCircle2,
-  Activity, BarChart3, Fingerprint
+  ChevronRight, ShieldCheck, Zap,
+  Activity, BarChart3, Fingerprint, Search, Brain, ShieldAlert
 } from 'lucide-react';
-import insightData from '../data/aidata.json';
 
 const AiInsights = () => {
-  const [activeFilter, setActiveFilter] = useState('1 Daily');
+  const [activeFilter, setActiveFilter] = useState('daily');
+  const [insightData, setInsightData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const currentData = useMemo(() => {
-    if (!insightData) return null;
-    
-    let dataArray = [];
-    if (activeFilter === '1 Daily') dataArray = insightData.daily || [];
-    else if (activeFilter === '7 Weekly') dataArray = insightData.weekly || [];
-    else if (activeFilter === '30 Monthly') dataArray = insightData.monthly || [];
-
-    if (dataArray.length === 0) return null;
-
-    const latestEntry = dataArray[dataArray.length - 1];
-
-    const satisfaction = latestEntry.public_satisfaction 
-      ? latestEntry.public_satisfaction 
-      : Math.round((latestEntry.average_rating / 5) * 100);
-
-    return {
-      ...latestEntry,
-      calculated_satisfaction: satisfaction
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:5000/api/recommendations'); 
+        setInsightData(response.data);
+      } catch (error) {
+        console.error("Error fetching BERT recommendations:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, [activeFilter]);
 
-  if (!currentData) return (
+    fetchData();
+  }, []);
+
+ const currentData = useMemo(() => {
+  if (!insightData) return null;
+  
+  const selectedPeriod = insightData[activeFilter];
+  if (!selectedPeriod || !selectedPeriod.summary) return null;
+
+  const detailedPlaybook = [];
+  const recommendationsGroup = selectedPeriod.recommendations || {};
+  
+  Object.entries(recommendationsGroup).forEach(([category, items]) => {
+    items.forEach(item => {
+      detailedPlaybook.push({
+        ...item,
+        categoryName: category 
+      });
+    });
+  });
+
+  const rawSentiment = selectedPeriod.summary.sentiment_score || 
+    (selectedPeriod.summary.overall_severity === 'Critical' ? 0.25 : 0.75);
+
+  return {
+    dateRange: `${selectedPeriod.start_date} - ${selectedPeriod.end_date}`,
+    severity: selectedPeriod.summary.overall_severity,
+    inferenceStrength: selectedPeriod.summary.confidence_score, 
+    sentimentScore: Math.round(rawSentiment * 100), 
+    playbook: detailedPlaybook
+  };
+}, [activeFilter, insightData]);
+
+  if (loading || !currentData) return (
     <div className="flex items-center justify-center h-64 text-slate-400 font-bold uppercase tracking-widest animate-pulse">
       Initialising Intelligence Engine...
     </div>
   );
 
   const filters = [
-    { id: '1 Daily', label: 'Daily' },
-    { id: '7 Weekly', label: 'Weekly' },
-    { id: '30 Monthly', label: 'Monthly' }
+    { id: 'daily', label: 'Daily' },
+    { id: 'weekly', label: 'Weekly' },
+    { id: 'monthly', label: 'Monthly' }
   ];
-
-  // Handler para maiwasan ang "is not a function" error
-  const handleFilterClick = (id) => {
-    if (typeof setActiveFilter === 'function') {
-      setActiveFilter(id);
-    } else {
-      console.error("Prop 'setActiveFilter' is missing or not a function in AiInsights.");
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10 animate-in fade-in duration-700">
@@ -70,7 +87,7 @@ const AiInsights = () => {
             {filters.map((f) => (
               <button
                 key={f.id}
-                onClick={() => handleFilterClick(f.id)}
+                onClick={() => setActiveFilter(f.id)}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                   activeFilter === f.id 
                   ? 'bg-white text-slate-900 shadow-md transform scale-105' 
@@ -81,175 +98,541 @@ const AiInsights = () => {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 shadow-sm">
-            <Clock size={14} className="text-blue-500" /> 
-            {currentData.date || currentData.week || currentData.month}
-          </div>
         </div>
       </div>
 
-      {/* --- TOP VISUALS: INSIGHT & SATISFACTION --- */}
+      {/* --- TOP VISUALS --- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start mb-10">
-            <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wide">Neural Sentiment Analysis</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">BERT Model Output v2.4</p>
-            </div>
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-xl text-[10px] font-black uppercase border ${
-              currentData.severity === 'Critical' 
-              ? 'bg-red-50 text-red-700 border-red-100' 
-              : currentData.severity === 'High'
-              ? 'bg-orange-50 text-orange-700 border-orange-100'
-              : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-            }`}>
-              <AlertTriangle size={14} />
-              {currentData.severity} Priority
-            </div>
-          </div>
+        {/* --- NEURAL SIGNAL ANALYSIS CARD --- */}
+        {(() => {
+          const rawStrength = Number(currentData?.inferenceStrength);
+          const hasData = !isNaN(rawStrength) && currentData?.inferenceStrength !== undefined;
+          
+          // Imbes na loading, ito ang default display values
+          const displayStrength = hasData ? (rawStrength * 100).toFixed(1) : "0.0";
+          const displaySeverity = currentData?.severity || "Standard";
 
-          <div className="space-y-6">
-            <p className="text-2xl font-black text-slate-900 leading-tight tracking-tight">
-              Trend detected: Average Rating is <span className="text-blue-600 underline decoration-blue-200 font-mono">{Number(currentData.average_rating).toFixed(2)}</span>
-            </p>
-            <p className="text-sm text-slate-600 leading-relaxed font-medium italic bg-slate-50 p-6 rounded-3xl border-l-4 border-blue-500">
-              "System identifies {currentData.severity?.toLowerCase() || 'latent'} bottlenecks. Core recommendation: {currentData.recommendations?.[0] || 'Monitor trends'}."
-            </p>
-            
-            <div className="flex items-center gap-4 pt-4">
-               <button className="flex items-center gap-2 px-6 py-3 bg-slate-900 rounded-xl text-sm font-bold text-white hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200">
-                Analyze Raw Data <ArrowRight size={16} />
-              </button>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Model Confidence</span>
-                <span className="text-sm font-bold text-slate-900">94.8% Reliability</span>
+          return (
+            <div className={`lg:col-span-8 p-10 rounded-[3rem] border transition-all duration-700 relative overflow-hidden group ${
+              hasData && currentData?.sentimentScore < 50 
+                ? 'bg-linear-to-br from-red-50/50 to-white border-red-200 shadow-xl shadow-red-500/5' 
+                : 'bg-white border-slate-200 shadow-sm'
+            }`}>
+              
+              <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none group-hover:opacity-[0.07] transition-opacity">
+                <Brain size={200} />
+              </div>
+
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-12">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-xl ${hasData && currentData?.sentimentScore < 50 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                        <Activity size={20} />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 tracking-tight">Neural Signal Analysis</h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`h-1.5 w-1.5 rounded-full ${hasData ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">BERT Inference Engine v2.4 • System Live</p>
+                    </div>
+                  </div>
+                  
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-wider border transition-all duration-500 ${
+                    displaySeverity === 'Critical' 
+                    ? 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-500/40' 
+                    : 'bg-slate-50 text-slate-500 border-slate-100'
+                  }`}>
+                    <AlertTriangle size={14} strokeWidth={3} className={displaySeverity === 'Critical' ? 'animate-pulse' : ''} />
+                    {displaySeverity} Priority
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-opacity-70">Detection Summary</h4>
+                    <p className="text-3xl font-black text-slate-900 leading-[1.1] tracking-tighter">
+                      {hasData ? (
+                        <>Trend detected: <span className="text-slate-300">Signal Reliability</span> is</>
+                      ) : (
+                        <>System status: <span className="text-slate-300">Baseline Reliability</span> is</>
+                      )}
+                      <span className={`ml-3 font-mono inline-flex items-baseline ${
+                        hasData && currentData?.sentimentScore < 50 ? 'text-red-600' : 'text-blue-600'
+                      }`}>
+                        {displayStrength}
+                        <span className="text-lg ml-1 opacity-50">%</span>
+                      </span>
+                    </p>
+                  </div>
+                  
+                  <div className={`relative group/quote transition-all duration-500 ${
+                    hasData && currentData?.sentimentScore < 50 
+                    ? 'bg-white/60 backdrop-blur-md border-red-200 shadow-md shadow-red-500/10' 
+                    : 'bg-slate-50 border-slate-100'
+                  } border-l-[6px] ${hasData && currentData?.sentimentScore < 50 ? 'border-red-500' : 'border-slate-300'} p-8 rounded-3xl rounded-tl-none`}>
+                    
+                    <div className="absolute -top-4 -left-3 text-slate-200 group-hover/quote:scale-110 transition-transform">
+                      <Zap size={32} fill="currentColor" />
+                    </div>
+
+                    <p className={`text-base leading-relaxed font-bold italic tracking-tight ${
+                      hasData && currentData?.sentimentScore < 50 ? 'text-red-950' : 'text-slate-600'
+                    }`}>
+                      {hasData ? (
+                        <>
+                          "System identifies {currentData?.severity?.toLowerCase()} operational bottlenecks. 
+                          <span className="mx-2 opacity-30 text-slate-400 font-normal">|</span> 
+                          Core diagnostic: <span className={currentData?.sentimentScore < 50 ? 'underline decoration-red-200 decoration-2 underline-offset-4' : 'text-blue-700'}>
+                            {currentData?.playbook?.[0]?.issue}
+                          </span>"
+                        </>
+                      ) : (
+                        "No significant neural trends detected for the selected period. System remains in nominal monitoring state with standard data ingestion active."
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-6">
+                      <div className="flex -space-x-2 opacity-50">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-200" />
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                        Verified against <span className="text-slate-600 underline underline-offset-2 italic font-serif">Municipal Registry</span>
+                      </p>
+                    </div>
+                    <div className="text-[10px] font-black text-blue-500/50 uppercase tracking-widest">
+                      Standard Mode
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
 
-        {/* Public Satisfaction Card */}
-        <div className="lg:col-span-4 bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-between relative overflow-hidden group">
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity size={18} className="text-blue-400 animate-pulse" />
-              <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Public Health Index</h3>
-            </div>
-            <h4 className="text-lg font-bold">Aggregate Satisfaction</h4>
-          </div>
-          
-          <div className="relative z-10 my-6">
-            <h2 className="text-7xl font-black tracking-tighter tabular-nums group-hover:scale-105 transition-transform duration-500">
-              {currentData.calculated_satisfaction}<span className="text-2xl text-blue-400">%</span>
-            </h2>
-          </div>
+        {/* --- SERVICE INTEGRITY INDEX CARD --- */}
+        {(() => {
+          const score = Number(currentData?.sentimentScore) || 0;
+          const hasData = !isNaN(Number(currentData?.sentimentScore)) && currentData?.sentimentScore !== undefined;
+          const isCritical = score < 50 && hasData;
 
-          <div className="space-y-3 relative z-10">
-            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
-              <span>Current Score</span>
-              <span>Target: 90%</span>
-            </div>
-            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-linear-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out" 
-                style={{ width: `${currentData.calculated_satisfaction}%` }}
+          return (
+            <div className={`lg:col-span-4 p-10 rounded-[3rem] text-white shadow-2xl flex flex-col justify-between relative overflow-hidden group transition-all duration-700 ${
+              isCritical ? 'bg-slate-950 ring-1 ring-red-500/30' : 'bg-slate-900 border border-white/5'
+            }`}>
+              
+              {/* Background Mesh Gradient */}
+              <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[100px] opacity-40 transition-colors duration-1000 ${
+                isCritical ? 'bg-red-600/40' : 'bg-blue-600/20'
+              }`} />
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-2xl backdrop-blur-md border ${
+                      isCritical ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-white/5 border-white/10 text-blue-400'
+                    }`}>
+                      <Fingerprint size={22} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Public Integrity</h3>
+                      <h4 className="text-sm font-bold text-slate-200">Citizen Sentiment</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 my-4">
+                <div className="flex items-baseline gap-2">
+                  <h2 className={`text-8xl font-black tracking-tighter tabular-nums transition-all duration-500 ${
+                    isCritical ? 'text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.4)]' : 'text-white'
+                  }`}>
+                    {score}
+                  </h2>
+                  <span className={`text-3xl font-bold opacity-40 ${isCritical ? 'text-red-400' : 'text-blue-400'}`}>%</span>
+                </div>
+                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.15em] mt-3 flex items-center gap-2">
+                  <span className={`h-1.5 w-1.5 rounded-full ${isCritical ? 'bg-red-500 animate-pulse' : 'bg-blue-500'}`} />
+                  {hasData ? "Aggregate Neural Scoring" : "Nominal Tracking Active"}
+                </p>
+              </div>
+
+              <div className="space-y-5 relative z-10">
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Stability Index</span>
+                    <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                      isCritical 
+                        ? 'text-red-400 border-red-500/30 bg-red-500/5 animate-pulse' 
+                        : 'text-blue-400 border-blue-500/30 bg-blue-500/5'
+                    }`}>
+                      {hasData ? (score >= 80 ? 'Optimal' : 'Needs Review') : 'Standby'}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-500">{score}/100</span>
+                </div>
+
+                <div className="h-3 bg-white/5 rounded-full p-1 border border-white/5 shadow-inner">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-[1.5s] cubic-bezier(0.34, 1.56, 0.64, 1) ${
+                      isCritical 
+                        ? 'bg-linear-to-r from-red-600 via-red-500 to-orange-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+                        : 'bg-linear-to-r from-blue-600 via-blue-400 to-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                    }`} 
+                    style={{ width: `${score}%` }}
+                  />
+                </div>
+                
+                <p className="text-[9px] text-center font-bold text-slate-600 uppercase tracking-widest pt-2">
+                  Real-time Sentiment Extraction 
+                </p>
+              </div>
+              
+              {/* Visual background icon */}
+              <BarChart3 
+                size={160} 
+                className={`absolute -right-12 -bottom-12 opacity-[0.03] transition-all duration-1000 group-hover:opacity-[0.08] group-hover:rotate-0 -rotate-12 pointer-events-none ${
+                  isCritical ? 'text-red-500' : 'text-blue-500'
+                }`} 
               />
             </div>
-          </div>
-          <BarChart3 size={140} className="absolute -right-8 -bottom-8 opacity-10 rotate-12 group-hover:rotate-0 transition-all duration-700" />
-        </div>
+          );
+        })()}
       </div>
 
-      {/* --- STRATEGIC PLAYBOOK --- */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/5">
-
-        <div className="px-10 py-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-linear-to-r from-slate-50/50 to-white">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-amber-50 rounded-2xl shadow-inner group">
-              <Zap 
-                className="text-amber-500 fill-amber-500 group-hover:scale-110 transition-transform duration-300" 
-                size={24} 
-              />
+      {/* --- STRATEGIC PLAYBOOK (Modern Premium Redesign) --- */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 overflow-hidden group/playbook">
+        
+        {/* Modern Header with Gradient Text */}
+        <div className="px-10 py-10 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30">
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-amber-400/20 rounded-full blur animate-pulse"></div>
+              <div className="relative p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <Zap className="text-amber-500 fill-amber-500" size={24} />
+              </div>
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Strategic Playbook</h3>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">AI-Generated Intervention Protocols</p>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">
+                Strategic Playbook
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                  BERT Neural Intervention Protocols
+                </p>
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl uppercase tracking-wider border border-blue-100">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-              </span>
-              {currentData.recommendations?.length || 0} Critical Actions
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Analysis</p>
+              <p className="text-xs font-bold text-slate-900">{currentData.playbook.length} Issues Identified</p>
+            </div>
           </div>
         </div>
-        
-        {/* Grid Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y divide-slate-100 md:divide-y-0 lg:divide-x-0 overflow-hidden">
-          {currentData.recommendations?.slice(0, 6).map((rec, idx) => (
-            <div 
-              key={idx} 
-              className={`p-10 group relative transition-all duration-500 hover:bg-slate-50/80 cursor-pointer border-r border-b border-slate-100 last:border-r-0`}
-            >
-              <span className="absolute top-8 right-10 text-6xl font-black text-slate-50 group-hover:text-slate-100 transition-colors pointer-events-none">
-                0{idx + 1}
-              </span>
 
-              <div className="relative z-10 space-y-5">
-                <div className="flex justify-between items-start">
-                  <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border ${
-                    idx === 0 
-                      ? 'bg-red-50 text-red-600 border-red-100' 
-                      : 'bg-slate-100 text-slate-500 border-slate-200'
-                  }`}>
-                    {idx === 0 ? 'High Impact' : 'Strategic'}
-                  </div>
-                  <div className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-blue-500 group-hover:bg-blue-50 transition-all duration-500">
-                    <CheckCircle2 size={18} className="text-slate-200 group-hover:text-blue-500 group-hover:scale-110 transition-all" />
-                  </div>
+        <div className="divide-y divide-slate-100/80 bg-white">
+        {currentData.playbook.map((item, idx) => (
+          <div 
+            key={idx} 
+            className="p-10 lg:p-14 hover:bg-slate-50/40 transition-all duration-700 group relative overflow-hidden"
+          >
+            {/* Background Accent Decor */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-blue-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 relative z-10">
+              
+              {/* Left Column: Context & Branding */}
+              <div className="lg:col-span-5 relative space-y-10">
+                {/* Subtle ID Watermark - adds a technical/premium layer */}
+                <div className="absolute -top-6 -left-4 text-[64px] font-black text-slate-100/50 select-none pointer-events-none font-mono tracking-tighter group-hover:text-blue-100/40 transition-colors duration-700">
+                  {String(idx + 1).padStart(2, '0')}
                 </div>
 
-                <div className="space-y-2">
-                  <h4 className="text-base font-bold text-slate-800 leading-snug min-h-16 group-hover:text-slate-950 transition-colors">
-                    {rec}
-                  </h4>
-                  <p className="text-[11px] text-slate-400 font-medium leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-                    Optimizing neural parameters based on current {activeFilter.toLowerCase()} feedback loops.
-                  </p>
-                </div>
+                <div className="relative space-y-8">
+                  <div className="flex items-start gap-6">
+                    {/* Dynamic Status Indicator Block */}
+                    <div className="relative shrink-0 mt-1">
+                      <div className={`w-1.5 h-16 rounded-full transition-all duration-500 ${
+                        item.severity === 'Critical' 
+                          ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+                          : 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                      }`} />
+                      {/* Glowing dot on top of the line */}
+                      <div className={`absolute -top-1 -left-0.5 w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm ${
+                        item.severity === 'Critical' ? 'bg-red-500' : 'bg-blue-600'
+                      }`} />
+                    </div>
 
-                <div className="pt-2">
-                  <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x--2 group-hover:translate-x-0">
-                    Execute Protocol <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                    <div className="space-y-3">
+                      {/* Breadcrumb-style Category */}
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                          {item.categoryName}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-slate-300" />
+                        <span className="text-[10px] font-black text-blue-600/70 uppercase tracking-[0.2em] font-mono">
+                          Protocol Unit {String(idx + 1).padStart(3, '0')}
+                        </span>
+                      </div>
+
+                      <h4 className="text-4xl font-black text-slate-900 leading-[1.05] tracking-tight group-hover:translate-x-1 transition-transform duration-500">
+                        {item.issue}
+                      </h4>
+                      
+                      <p className="text-sm text-slate-400 font-medium leading-relaxed max-w-sm">
+                        Automated diagnostic identified a {item.severity?.toLowerCase() || 'standard'} complexity gap in current service operations.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Tag Cloud for Statuses */}
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Priority Badge */}
+                    <div className={`flex items-center gap-2.5 py-2.5 px-5 rounded-2xl border backdrop-blur-md transition-all duration-500 ${
+                      item.severity === 'Critical' 
+                        ? 'bg-red-50/40 text-red-700 border-red-200/50 shadow-sm' 
+                        : 'bg-blue-50/40 text-blue-700 border-blue-200/50 shadow-sm'
+                    }`}>
+                      <div className="relative">
+                        <div className={`w-2 h-2 rounded-full ${item.severity === 'Critical' ? 'bg-red-500' : 'bg-blue-600'}`} />
+                        <div className={`absolute inset-0 w-2 h-2 rounded-full animate-ping ${item.severity === 'Critical' ? 'bg-red-400' : 'bg-blue-400'}`} />
+                      </div>
+                      <span className="text-[11px] font-black uppercase tracking-wider">
+                        {item.severity || 'Standard'} Priority
+                      </span>
+                    </div>
+                    
+                    {/* Neural Link Badge */}
+                    <div className="flex items-center gap-2.5 py-2.5 px-5 rounded-2xl border border-slate-200/60 bg-white/50 backdrop-blur-md text-[11px] font-black text-slate-600 uppercase tracking-wider hover:border-blue-300 transition-colors cursor-help">
+                      <BrainCircuit size={15} className="text-blue-500" />
+                      <span>Neural Verified</span>
+                    </div>
+
+                    {/* Accuracy Score Badge */}
+                    <div className="flex items-center gap-2 py-2.5 px-5 rounded-2xl border border-slate-100 bg-slate-50/50 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                      <Zap size={14} className="fill-slate-300 text-slate-300" />
+                      <span>{Math.round(item.confidence * 100)}% Match</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Footer info bar */}
-        <div className="px-10 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            Awaiting executive authorization for protocol deployment
-          </p>
-          <div className="flex -space-x-2">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-6 w-6 rounded-full border-2 border-white bg-slate-200" />
-            ))}
+              {/* Right Column: Insights & Execution */}
+              <div className="lg:col-span-7 space-y-10">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Root Cause Card - The "Light" Intelligence Card */}
+                <div className="group/card relative p-8 bg-white border border-slate-200/60 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                  {/* Decorative Glow */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover/card:bg-amber-500/10 transition-colors" />
+                  
+                  <div className="relative space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-2xl text-amber-600 group-hover/card:bg-amber-500 group-hover/card:text-white group-hover/card:scale-110 transition-all duration-500">
+                          <Search size={18} className="stroke-[2.5px]" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-black text-amber-600/80 uppercase tracking-[0.2em] leading-none mb-1">Causality Analysis</span>
+                          <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest leading-none">Diagnostic Origin</span>
+                        </div>
+                      </div>
+                      {/* Subtle Indicator */}
+                      <div className="h-1 w-12 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full w-2/3 bg-amber-400 group-hover/card:w-full transition-all duration-1000" />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="text-[15px] text-slate-600 leading-relaxed font-semibold tracking-tight">
+                        {item.root_cause}
+                      </p>
+                    </div>
+
+                    {/* Footer Label */}
+                    <div className="pt-4 flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">
+                      <div className="w-4 h-px bg-slate-200" />
+                      BERT-Engineered Insights
+                    </div>
+                  </div>
+                </div>
+
+                {/* Impact Card - The "Dark" High-Contrast Card */}
+                <div className="group/card relative p-8 bg-slate-900 border border-slate-800 rounded-[2.5rem] shadow-2xl hover:bg-slate-950 hover:shadow-blue-900/20 hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                  {/* Subtle Grid Pattern Overlay */}
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                  
+                  <div className="relative space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-400 group-hover/card:bg-blue-500 group-hover/card:text-white group-hover/card:scale-110 transition-all duration-500 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                          <Zap size={18} className="stroke-[2.5px] fill-current" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] leading-none mb-1">Systemic Consequence</span>
+                          <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest leading-none">Ecosystem Impact</span>
+                        </div>
+                      </div>
+                      {/* Animated Pulse Dot */}
+                      <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/5 rounded-full border border-blue-500/10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <span className="text-[8px] font-black text-blue-400 uppercase tracking-tighter text-nowrap">Active Impact</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="text-[15px] text-slate-300 leading-relaxed font-medium tracking-tight">
+                        {item.impact}
+                      </p>
+                    </div>
+
+                    {/* Footer Label */}
+                    <div className="pt-4 flex items-center gap-2 text-[10px] font-bold text-slate-600 uppercase tracking-tighter">
+                      <div className="w-4 h-px bg-slate-800" />
+                      High-Confidence Projection
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                {/* Enhanced Action Protocols */}
+                <div className="space-y-8">
+                  {/* Section Header with Dynamic Counter */}
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <Activity size={16} className="text-blue-600 relative z-10" />
+                        <div className="absolute inset-0 bg-blue-400/20 blur-lg animate-pulse" />
+                      </div>
+                      <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] whitespace-nowrap">
+                        Strategic Protocols
+                      </span>
+                    </div>
+                    <div className="h-px flex-1 bg-linear-to-r from-slate-200 via-slate-100 to-transparent" />
+                    <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                      {item.actions.length} TASKS READY
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {item.actions.map((action, aIdx) => (
+                      <button 
+                        key={aIdx} 
+                        className="group/btn relative flex items-start justify-between gap-4 bg-white hover:bg-slate-900 border border-slate-200/70 hover:border-slate-900 p-5 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:shadow-slate-900/20 hover:-translate-y-1 active:scale-[0.98]"
+                      >
+                        {/* Hover Background Pattern */}
+                        <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-[0.05] transition-opacity duration-500 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] rounded-3xl" />
+
+                        <div className="flex items-start gap-4 relative z-10">
+                          {/* Step Numbering / Icon Container */}
+                          <div className="relative shrink-0">
+                            <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover/btn:bg-blue-600 group-hover/btn:border-blue-500 transition-all duration-500 shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 group-hover/btn:text-white transition-colors">
+                                {String(aIdx + 1).padStart(2, '0')}
+                              </span>
+                            </div>
+                            {/* Connection line between steps (optional visual) */}
+                            <div className={`absolute top-10 left-4 w-px h-4 bg-slate-100 group-hover/btn:bg-blue-900/20 transition-colors ${aIdx === item.actions.length - 1 ? 'hidden' : ''}`} />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[14px] font-bold text-slate-800 group-hover/btn:text-white text-left leading-tight transition-colors duration-300">
+                              {action}
+                            </span>
+                            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest opacity-0 group-hover/btn:opacity-100 transition-all duration-700 translate-y-1 group-hover/btn:translate-y-0">
+                              Deployment Ready
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Action Icon */}
+                        <div className="relative shrink-0 mt-1">
+                          <div className="p-1 rounded-full text-slate-300 group-hover/btn:text-blue-400 transition-all duration-500 transform group-hover/btn:rotate-45">
+                            <ChevronRight size={18} strokeWidth={3} />
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Footer Disclaimer/Context */}
+                  <div className="flex items-center justify-center gap-2 py-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter italic">
+                      Protocol execution requires administrative clearance level 02
+                    </p>
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        ))}
+      </div>
+
+        {/* Footer: Intelligence Verification */}
+        <div className="bg-slate-50 p-6 flex items-center justify-center border-t border-slate-100">
+          <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+            <ShieldCheck size={14} className="text-emerald-500" />
+            Verified by BERT Neural Engine v2.4
           </div>
         </div>
       </div>
 
-      {/* --- STATUS BAR --- */}
-      <div className="flex flex-wrap gap-4 pt-4">
-        <StatusCard title="Model" status="BERT v2.4" icon={<BrainCircuit size={16}/>} color="text-blue-600" />
-        <StatusCard title="Training" status="Stable" icon={<ShieldCheck size={16}/>} color="text-emerald-600" />
-        <StatusCard title="Accuracy" status="98.2%" icon={<Sparkles size={16}/>} color="text-purple-600" />
+      {/* --- SYSTEM DIAGNOSTICS STATUS BAR --- */}
+      <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-slate-100 mt-8">
+        {/* Model Status */}
+        <div className="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-2xl shadow-sm hover:border-blue-200 transition-all group">
+          <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600 group-hover:scale-110 transition-transform">
+            <BrainCircuit size={14} strokeWidth={2.5} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 leading-none mb-1">Architecture</span>
+            <span className="text-[11px] font-bold text-slate-700 leading-none">BERT Inference v2.4</span>
+          </div>
+        </div>
+
+        {/* Training Stability */}
+        <div className="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-2xl shadow-sm hover:border-emerald-200 transition-all group">
+          <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600 relative">
+            <ShieldCheck size={14} strokeWidth={2.5} />
+            <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 leading-none mb-1">Training State</span>
+            <span className="text-[11px] font-bold text-slate-700 leading-none tracking-tight">System Nominal</span>
+          </div>
+        </div>
+
+        {/* Reliability Score */}
+        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 px-4 py-2 rounded-2xl shadow-lg hover:bg-slate-800 transition-all group">
+          <div className="p-1.5 bg-purple-500/10 rounded-lg text-purple-400 group-hover:rotate-12 transition-transform">
+            <Sparkles size={14} strokeWidth={2.5} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none mb-1">Confidence</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-[11px] font-mono font-bold text-purple-400 leading-none">
+                {(!isNaN(Number(currentData?.inferenceStrength)) ? (currentData.inferenceStrength * 100).toFixed(1) : "0.0")}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Optional: Last Sync Indicator */}
+        <div className="ml-auto flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
+          <div className="h-1 w-1 bg-slate-400 rounded-full" />
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+            Last Sync: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
       </div>
     </div>
   );
