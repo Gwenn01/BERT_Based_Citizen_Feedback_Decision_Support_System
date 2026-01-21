@@ -73,9 +73,7 @@ def run_services_tests():
     # recommendation = generate_decision_support(data)
     # print(recommendation)
     
-    
-    
-
+    # run the bert model and check if there is an error
     # print(predict_sentiment("Very rude and very slow service"))
     # print(predict_sentiment("Very fast and very kind staff"))
     # print(predict_sentiment("The process is okay, no problem"))

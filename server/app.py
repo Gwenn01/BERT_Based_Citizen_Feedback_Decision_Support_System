@@ -27,12 +27,15 @@ from routes.get_survey_routes import survey_bp
 from routes.admin_overview_routes import admin_overview_bp
 #SERVICE PERFORMANCE MONITORING
 from routes.admin_service_performance_routes import admin_performance_bp
+#RECOMMENDATIONS
+from routes.admin_recommendations_routes import admin_recommendation_bp
 #SENTIMENT ANALYSIS
 app.register_blueprint(health_bp,  url_prefix="/api")
 app.register_blueprint(test_db_bp, url_prefix="/api")
 app.register_blueprint(survey_bp, url_prefix="/api")
 app.register_blueprint(admin_overview_bp, url_prefix="/api")
 app.register_blueprint(admin_performance_bp, url_prefix="/api")
+app.register_blueprint(admin_recommendation_bp, url_prefix="/api")
 # -------------------------------------------------
 @app.route("/")
 def home():
