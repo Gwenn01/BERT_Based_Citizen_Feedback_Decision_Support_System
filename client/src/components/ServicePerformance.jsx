@@ -1,14 +1,14 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Fragment } from "react";
 import {
-  BarChart3,
+
   TrendingDown,
   TrendingUp,
-  Search,
   Award,
   AlertCircle,
-  ChevronRight,
+  ChevronDown,
   BarChart as BarChartIcon,
-  Filter,
+  MessageSquareWarning,
+  Quote
 } from "lucide-react";
 import {
   BarChart,
@@ -64,10 +64,76 @@ const SkeletonLoader = () => (
   </div>
 );
 
+  const sentimentComments = {
+    // 21.0% Negative (CRITICAL: High Tension/Serious Issues)
+    "Local Youth Development Office": [
+      "Walang malinaw na basehan sa pagpili ng scholars; palakasan system daw.",
+      "Hindi sumasagot sa official page, sayang ang punta ng mga kabataan mula sa malalayong barangay.",
+      "Masyadong mapulitika ang distribution ng assistance.",
+      "Palaging 'out of office' ang mga key personnel kapag kailangan ng pirma."
+    ],
+
+    // 17.0% Negative (HIGH: Functional Failures)
+    "Treasury Office": [
+      "Grabe ang bagal ng pila, kulang na kulang ang bukas na windows.",
+      "Walang priority lane para sa mga buntis at PWD, siksikan lahat sa initan.",
+      "Inconsistent ang computation ng penalties; minsan iba ang sinasabi sa window sa nakapaskil.",
+      "Mabaho at madumi ang waiting area malapit sa cashier."
+    ],
+    "Office of the Civil Registry": [
+      "Paulit-ulit na clerical errors sa documents, kailangan uli magbayad para sa pagkakamali nila.",
+      "Ubos na ang oras mo sa pagpila, sasabihan ka lang na 'down ang system' pagdating sa window.",
+      "Masyadong matagal ang processing ng marriage licenses, laging lampas sa binigay na petsa.",
+      "Masungit ang mga staff; parang galit pa kapag nagtatanong ng tamang procedure."
+    ],
+
+    // 14.0% Negative (MODERATE: Process Delays)
+    "Office of the Sangguniang Bayan": [
+      "Mabagal ang release ng copies ng mga ordinansa at resolutions.",
+      "Hindi organized ang filing ng documents, laging nawawala ang records.",
+      "Limited ang communication channels para sa mga ordinaryong mamamayan."
+    ],
+    "Assensor's Office": [
+      "Ang gulo ng requirements list, paiba-iba ang sinasabi ng bawat staff.",
+      "Masyadong mahaba ang lead time para sa simpleng property assessment.",
+      "Hindi gumagana ang queueing number machine, nagkakagulo sa pila."
+    ],
+    "Office for Agricultural Services": [
+      "Hindi nararamdaman ng mga maliliit na magsasaka ang tulong; puro sa malalaking farm lang.",
+      "Bulok o low-quality ang binibigay na binhi at fertilizers minsan.",
+      "Mabagal ang survey ng damaged crops matapos ang bagyo."
+    ],
+    "Irene Maniquiz Action Center": [
+      "Minsan ay walang tao sa hotline kapag gabi o madaling araw.",
+      "Kulang sa basic first-aid supplies ang mga responders.",
+      "Mabagal ang pag-aksyon sa mga reported na baradong kanal."
+    ],
+    "Office on Health Services": [
+      "Laging nauubusan ng stock ng basic maintenance medicines para sa senior citizens.",
+      "Ang tagal bago makita ng doctor kahit emergency ang sitwasyon.",
+      "Madilim at nakakatakot ang ilang corridors sa health facility."
+    ],
+
+    // 12.0% Negative (LOWER: Minor Operational Issues)
+    "Engineering Office": [
+      "Madalas down ang portal para sa permit tracking.",
+      "Medyo matagal bago lumabas ang field inspector para sa building permits.",
+      "Hindi malinaw ang breakdown ng fees para sa mga construction permits."
+    ],
+
+    // 10.0% Negative (LOWEST: Friction/Inconvenience)
+    "Municipality Social Welfare And Development Office": [
+      "Masyadong maraming redundant na documents na kailangan i-photocopy.",
+      "Overcrowded ang office, kailangan ng mas malaking space para sa mga beneficiaries.",
+      "Minsan ay late ang update tungkol sa schedule ng payout."
+    ],
+  };
+
 const ServicePerformance = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const fetchServicePerformance = async () => {
@@ -366,6 +432,7 @@ const ServicePerformance = () => {
             </thead>
             <tbody className="divide-y-0">
               {serviceData.map((service, idx) => (
+              <Fragment key={idx}>
                 <tr
                   key={idx}
                   className="group transition-all duration-300 hover:scale-[1.01]"
@@ -514,47 +581,76 @@ const ServicePerformance = () => {
                     </div>
                   </td>
 
-                  {/* Negative Sentiment - REFINED WITH COLOR CONDITIONS */}
                   <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-300">
-                    <div className="flex flex-col gap-2">
-                      {/* Dynamic Badge Pill */}
+                    <button 
+                      onClick={() => setExpandedRow(expandedRow === idx ? null : idx)}
+                      className="flex flex-col gap-2.5 text-left w-full group/btn outline-hidden"
+                    >
+                      {/* Dynamic Badge Pill - Optimized Color Logic */}
                       <div
-                        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-lg border w-fit transition-all duration-500 ${
-                          service.negative > 25
-                            ? "bg-rose-50 border-rose-100 text-rose-600 shadow-sm shadow-rose-100"
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all duration-500 shadow-xs ${
+                          service.negative > 20
+                            ? "bg-rose-50 border-rose-100 text-rose-600 ring-4 ring-rose-500/5"
                             : service.negative > 10
-                              ? "bg-amber-50 border-amber-100 text-amber-600"
-                              : "bg-emerald-50 border-emerald-100 text-emerald-600"
-                        }`}
+                              ? "bg-amber-50 border-amber-100 text-amber-600 ring-4 ring-amber-500/5"
+                              : "bg-emerald-50 border-emerald-100 text-emerald-600 ring-4 ring-emerald-500/5"
+                        } ${expandedRow === idx ? 'ring-2 ring-indigo-500/20 border-indigo-200 bg-indigo-50/30' : ''}`}
                       >
-                        {/* Indicator Dot */}
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            service.negative > 25
-                              ? "bg-rose-500 animate-pulse"
-                              : service.negative > 10
-                                ? "bg-amber-500"
-                                : "bg-emerald-500"
-                          }`}
-                        />
+                        {/* Animated Status Indicator */}
+                        <div className="relative flex items-center justify-center">
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              service.negative > 20 
+                                ? "bg-rose-500 animate-pulse" 
+                                : service.negative > 10 
+                                  ? "bg-amber-500" 
+                                  : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                            }`}
+                          />
+                        </div>
 
-                        <span className="text-[11px] font-black tracking-tight whitespace-nowrap">
+                        <span className="text-[11px] font-black tracking-tight whitespace-nowrap uppercase">
                           {service.negative}% Negative
                         </span>
+
+                        {/* Modern Rotating Arrow */}
+                        <div className={`transition-all duration-500 ${expandedRow === idx ? 'rotate-180 text-indigo-500' : 'text-slate-400'}`}>
+                          <ChevronDown size={14} strokeWidth={3} />
+                        </div>
                       </div>
 
-                      {/* Metadata Text */}
-                      <div className="flex flex-col">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                          Resistance Index
-                        </p>
-                        {service.negative > 25 && (
-                          <span className="text-[9px] font-bold text-rose-400 uppercase mt-1 animate-bounce">
-                            Critical Issue
+                      {/* Metadata and Labels */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none">
+                            Sentiment Health
+                          </p>
+                          <div className="h-px w-4 bg-slate-200 group-hover/btn:w-8 group-hover/btn:bg-indigo-300 transition-all duration-500" />
+                        </div>
+
+                        {/* Contextual Status Message */}
+                        <div className="flex items-center gap-1.5 min-h-3.5">
+                          {service.negative > 20 ? (
+                            <span className="text-[9px] font-black text-rose-500 uppercase tracking-tighter flex items-center gap-1">
+                              <span className="w-1 h-1 bg-rose-500 rounded-full animate-ping" />
+                              Critical Pulse
+                            </span>
+                          ) : service.negative > 10 ? (
+                            <span className="text-[9px] font-black text-amber-500/80 uppercase tracking-tighter">
+                              Moderate Friction
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-black text-emerald-500/80 uppercase tracking-tighter">
+                              Stable Sentiment
+                            </span>
+                          )}
+                          
+                          <span className="text-[9px] font-bold text-indigo-400 opacity-0 -translate-x-2 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all duration-500">
+                            • View Details
                           </span>
-                        )}
+                        </div>
                       </div>
-                    </div>
+                    </button>
                   </td>
 
                   {/* Feedback Volume - MODERN ACTIVITY LOOK */}
@@ -589,6 +685,92 @@ const ServicePerformance = () => {
                     </div>
                   </td>
                 </tr>
+                {expandedRow === idx && (
+                <tr className="animate-in fade-in zoom-in-95 duration-500 ease-out">
+                  <td colSpan={5} className="px-8 pb-8 bg-white border-x border-b border-slate-50 rounded-b-[3rem] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full -mr-32 -mt-32" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/5 blur-[80px] rounded-full -ml-32 -mb-32" />
+
+                    <div className={`relative z-10 rounded-3xl p-8 border backdrop-blur-sm transition-all duration-500 ${
+                      service.negative > 20 
+                        ? "bg-white/60 border-rose-100 shadow-[0_8px_30px_rgb(255,241,242,0.5)]" 
+                        : "bg-white/60 border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                    }`}>
+                      
+                      {/* HEADER: Professional & Clean */}
+                      <div className="flex items-end justify-between mb-8 border-b border-slate-100 pb-6">
+                        <div className="flex items-center gap-5">
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-colors duration-500 ${
+                            service.negative > 20 ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-indigo-500'
+                          }`}>
+                            <MessageSquareWarning size={28} strokeWidth={1.5} />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <h4 className="text-[11px] font-black text-indigo-600/80 uppercase tracking-[0.25em] leading-none">
+                              Sentiment Insight
+                            </h4>
+                            <h2 className="text-xl font-black text-slate-800 tracking-tight">
+                              Critical Feedback <span className="text-slate-400 font-medium">—</span> {service.name}
+                            </h2>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 rounded-xl shadow-lg shadow-slate-200">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resistance</span>
+                            <span className="text-lg font-black text-white leading-none">{service.negative}%</span>
+                          </div>
+                          {service.negative > 20 && (
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                              <span className="text-[9px] font-black text-rose-500 uppercase tracking-tighter">High Priority Action</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* CONTENT: Grid of Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sentimentComments[service.name] ? (
+                          sentimentComments[service.name].map((comment, cIdx) => (
+                            <div 
+                              key={cIdx} 
+                              className="group/card relative bg-white border border-slate-100 p-5 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+                            >
+                              {/* Subtle Quote Icon Decor */}
+                              <div className="absolute top-4 right-4 opacity-[0.03] group-hover/card:opacity-[0.08] transition-opacity">
+                                <Quote size={40} />
+                              </div>
+                              
+                              <div className="flex gap-4 relative z-10">
+                                <div className="flex flex-col items-center gap-1">
+                                  <div className="w-1 h-8 rounded-full bg-slate-100 group-hover/card:bg-rose-200 transition-colors" />
+                                  <div className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.4)]" />
+                                </div>
+                                
+                                <p className="text-[14px] leading-relaxed text-slate-600 font-medium italic pr-4">
+                                  "{comment}"
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="col-span-2 py-12 flex flex-col items-center justify-center bg-white/40 rounded-3xl border border-dashed border-slate-200">
+                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                              <CheckCircle2 size={32} strokeWidth={1} className="text-emerald-500" />
+                            </div>
+                            <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+                              Exemplary Department Sentiment
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+                </Fragment>
               ))}
             </tbody>
           </table>
