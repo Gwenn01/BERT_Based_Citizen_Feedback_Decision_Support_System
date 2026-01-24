@@ -2,6 +2,7 @@
 venv/
 env/
 .env
+.venv/
 
 # Python bytecode
 __pycache__/
@@ -21,3 +22,6 @@ build/
 .env
 server/token.txt
 server/myHug.txt
+
+
+
