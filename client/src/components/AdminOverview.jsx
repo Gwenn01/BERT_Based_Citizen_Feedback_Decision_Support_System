@@ -51,6 +51,9 @@ const KPICard = ({
   iconName,
   variant,
   statusLabel,
+  onSentimentSelect,
+  isSentimentCard = false,
+  activeSentiment, 
 }) => {
   const colors = {
     green: "bg-green-50 text-green-600 ring-green-100",
@@ -60,51 +63,95 @@ const KPICard = ({
     amber: "bg-amber-50 text-amber-600 ring-amber-100",
   };
 
-  // Logic para sa Trend Badge color
-  const isPositive =
-    trend.includes("+") ||
-    ["Moderate", "Stable", "Improving", "Optimal"].includes(trend);
-  const trendColor = isPositive
-    ? "bg-green-100 text-green-700"
-    : "bg-red-100 text-red-700";
+  const isPositive = trend.includes("+") || ["Moderate", "Stable", "Improving", "Optimal"].includes(trend);
+  const trendColor = isPositive ? "bg-green-100/50 text-green-700" : "bg-red-100/50 text-red-700";
 
   return (
-    <div className="group bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
-      <div className="relative z-10 flex flex-col h-full justify-between">
-        <div>
-          <div
-            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 ring-1 transition-transform duration-500 group-hover:rotate-6 ${colors[variant] || colors.blue}`}
-          >
-            {getIcon(iconName)}
+    <div className="group bg-white p-6 sm:p-7 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden relative flex flex-col justify-between min-h-60">
+      
+      {/* 1. Header & Icon Section */}
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-4">
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ring-1 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 ${colors[variant] || colors.blue}`}>
+            {getIcon(iconName, 28)}
           </div>
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
-            {title}
-          </p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              {value}
-            </span>
-            {total && (
-              <span className="text-sm font-bold text-slate-400">{total}</span>
-            )}
+          
+          <div className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm border border-white/50 ${trendColor}`}>
+            {trend}
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-6 flex items-center gap-3">
-          <div
-            className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-black px-2 sm:px-3 py-1 rounded-xl shadow-inner ${trendColor}`}
-          >
-            {trend}
-          </div>
-          {/* DITO ANG PAGBABAGO: Dynamic rendering ng statusLabel */}
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            {statusLabel || "Status Level"}
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">
+          {title}
+        </p>
+        
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">
+            {value}
           </span>
+          {total && (
+            <span className="text-sm font-bold text-slate-300 tabular-nums">{total}</span>
+          )}
         </div>
       </div>
 
-      {/* Subtle Background Glow */}
-      <div className="absolute -right-6 -bottom-6 w-24 h-24 sm:w-32 sm:h-32 bg-slate-50/50 rounded-full blur-2xl group-hover:bg-slate-100 transition-colors duration-500" />
+      {/* 2. Sentiment Controls Section (Premium Layout) */}
+      <div className="relative z-10 mt-6">
+        {isSentimentCard ? (
+          <div className="flex flex-col gap-3">
+             <div className="flex items-center justify-between">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Filter Analysis</span>
+                <span className="h-px flex-1 bg-slate-100 ml-3"></span>
+             </div>
+             
+             <div className="grid grid-cols-3 gap-2">
+            {["positive", "neutral", "negative"].map((type) => {
+              const isActive = activeSentiment === type;
+              
+              // Dynamic Styles base sa State
+              const typeColors = {
+                positive: isActive 
+                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200" 
+                  : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-100",
+                neutral: isActive 
+                  ? "bg-amber-500 text-white shadow-lg shadow-amber-200" 
+                  : "bg-amber-50 text-amber-600 hover:bg-amber-100 border-amber-100",
+                negative: isActive 
+                  ? "bg-rose-600 text-white shadow-lg shadow-rose-200" 
+                  : "bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-100",
+              };
+
+              return (
+                <button
+                  key={type}
+                  onClick={() => onSentimentSelect(type)}
+                  className={`
+                    relative py-2 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all duration-300 border
+                    ${typeColors[type]}
+                    ${isActive ? '-translate-y-0.5 scale-105' : 'border-transparent opacity-70 hover:opacity-100'}
+                  `}
+                >
+                  {type}
+                </button>
+              );
+            })}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              {statusLabel || "Performance"}
+            </span>
+            <div className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse"></div>
+          </div>
+        )}
+      </div>
+
+      {/* 3. Aesthetic Background Glow */}
+      <div className={`absolute -right-8 -bottom-8 w-32 h-32 rounded-full blur-3xl opacity-20 transition-colors duration-500 
+        ${variant === 'green' ? 'bg-emerald-400' : variant === 'red' ? 'bg-rose-400' : 'bg-blue-400'} 
+        group-hover:opacity-40`} 
+      />
     </div>
   );
 };
@@ -116,6 +163,7 @@ const AdminOverview = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedSentiment, setSelectedSentiment] = useState("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -213,6 +261,14 @@ const AdminOverview = () => {
     { time: "CC3", score: currentView.charter_awareness.cc3 },
   ];
 
+  const filteredFeedback =
+    selectedSentiment === "all"
+      ? feedbackData
+      : feedbackData.filter(
+          (item) =>
+            item.sentiment?.toLowerCase() === selectedSentiment.toLowerCase()
+        );
+
   return (
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900 overflow-x-hidden">
       {/* Main Container - Matched max-width and vertical padding */}
@@ -261,6 +317,12 @@ const AdminOverview = () => {
               {...kpi}
               iconName={kpi.icon}
               statusLabel={kpi.statusLabel}
+              isSentimentCard={kpi.title.toLowerCase().includes("sentiment")}
+              activeSentiment={selectedSentiment}
+              onSentimentSelect={(sentiment) =>
+                setSelectedSentiment((prev) =>
+                 prev === sentiment ? "all" : sentiment
+                )}
             />
           ))}
         </div>
@@ -699,7 +761,7 @@ const AdminOverview = () => {
                 </tr>
               </thead>
               <tbody className="divide-y-0">
-                {feedbackData.map((item) => (
+                {filteredFeedback.map((item) => (
                   <tr
                     key={item.id}
                     className="group transition-all duration-300 hover:scale-[1.005]"
@@ -856,6 +918,58 @@ const AdminOverview = () => {
                     </td>
                   </tr>
                 ))}
+                {filteredFeedback.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="py-24 px-6">
+                      <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
+                        
+                        {/* Decorative Icon Container */}
+                        <div className="relative mb-6">
+                          {/* Subtle Outer Glow */}
+                          <div className="absolute inset-0 bg-slate-200/50 rounded-full blur-3xl scale-150" />
+                          
+                          <div className="relative h-20 w-20 bg-white border border-slate-100 rounded-4xl shadow-xl flex items-center justify-center overflow-hidden">
+                            {/* Animated Background Pulse */}
+                            <div className="absolute inset-0 bg-linear-to-tr from-slate-50 to-white" />
+                            
+                            <MessageSquare 
+                              size={32} 
+                              className={`relative z-10 transition-colors duration-500 ${
+                                selectedSentiment === 'positive' ? 'text-emerald-400' : 
+                                selectedSentiment === 'negative' ? 'text-rose-400' : 
+                                selectedSentiment === 'neutral' ? 'text-amber-400' : 'text-slate-300'
+                              }`} 
+                            />
+                            
+                            {/* Small floating dots for "searching" effect */}
+                            <div className="absolute top-3 right-3 h-1.5 w-1.5 bg-blue-400 rounded-full animate-ping" />
+                          </div>
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="text-center space-y-2 relative z-10">
+                          <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">
+                            No {selectedSentiment !== 'all' ? selectedSentiment : ''} records found
+                          </h3>
+                          <p className="text-sm text-slate-400 font-medium max-w-70 leading-relaxed">
+                            We couldn't find any feedback matching the current filters. Try selecting a different category or time range.
+                          </p>
+                        </div>
+
+                        {/* Reset Action Button */}
+                        <button
+                          onClick={() => setSelectedSentiment("all")}
+                          className="mt-8 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-slate-200 hover:bg-blue-600 hover:shadow-blue-100 hover:-translate-y-0.5 transition-all duration-300"
+                        >
+                          Clear All Filters
+                        </button>
+
+                        {/* Aesthetic Detail: Bottom Line */}
+                        <div className="w-16 h-1 bg-slate-100 rounded-full mt-10" />
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

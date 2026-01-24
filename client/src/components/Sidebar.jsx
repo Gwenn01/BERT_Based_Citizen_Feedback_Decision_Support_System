@@ -16,6 +16,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       icon: <LayoutDashboard size={20} />,
       description: "System-wide summary",
     },
+    { 
+      id: 'analysis', 
+      name: 'Feedback Analysis', 
+      icon: <Search size={20} />,
+      description: 'BERT sentiment deep-dive'
+    },
     {
       id: "service",
       name: "Service Performance",
