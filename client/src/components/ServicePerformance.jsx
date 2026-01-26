@@ -5,10 +5,10 @@ import {
   TrendingUp,
   Award,
   AlertCircle,
-  ChevronDown,
   BarChart as BarChartIcon,
-  MessageSquareWarning,
-  Quote
+  BarChart3,
+  Users,
+  Activity
 } from "lucide-react";
 import {
   BarChart,
@@ -20,7 +20,12 @@ import {
   ResponsiveContainer,
   Cell,
   LabelList,
+  RadialBarChart,
+  RadialBar,
+  AreaChart,
+  Area
 } from "recharts";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 const SkeletonLoader = () => (
@@ -68,6 +73,7 @@ const ServicePerformance = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     const fetchServicePerformance = async () => {
@@ -96,6 +102,10 @@ const ServicePerformance = () => {
     if (!serviceData || serviceData.length === 0) return null;
     return [...serviceData].sort((a, b) => b.negative - a.negative)[0];
   }, [serviceData]);
+
+  const toggleRow = (idx) => {
+    setExpandedRow(expandedRow === idx ? null : idx);
+  };
   
   if (loading) return <SkeletonLoader />;
   if (error) return <p>{error}</p>;
@@ -368,11 +378,13 @@ const ServicePerformance = () => {
               {serviceData.map((service, idx) => (
               <Fragment key={idx}>
                 <tr
-                  key={idx}
-                  className="group transition-all duration-300 hover:scale-[1.01]"
+                  onClick={() => toggleRow(idx)}
+                  className={`group cursor-pointer transition-colors duration-300 ${
+                    expandedRow === idx ? "bg-slate-50/80" : "hover:bg-slate-50/50"
+                  }`}
                 >
                   {/* Office Name - PREMIUM MODERN LOOK */}
-                  <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-l-4xl border-y border-l border-transparent group-hover:border-slate-100 group-hover:shadow-sm transition-all duration-300">
+                  <td className="px-6 py-5 min-w-80 bg-slate-50/50 group-hover:bg-white rounded-l-4xl border-y border-l border-transparent group-hover:border-slate-100 group-hover:shadow-sm transition-all duration-300">
                     <div className="flex items-center gap-4">
                       {/* Dynamic Avatar/Icon Box */}
                       <div className="relative group/icon">
@@ -380,7 +392,7 @@ const ServicePerformance = () => {
                           {/* Subtle background pattern/glow */}
                           <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                          <span className="relative z-10 text-[13px] font-black text-slate-400 group-hover:text-indigo-600 tracking-tighter transition-colors">
+                          <span className="relative z-10 text-[13px] font-black text-slate-400 group-hover:text-indigo-600 tracking-tighter transition-colors whitespace-nowrap">
                             {service.name.substring(0, 2).toUpperCase()}
                           </span>
                         </div>
@@ -608,6 +620,161 @@ const ServicePerformance = () => {
                     </div>
                   </td>
                 </tr>
+                <AnimatePresence initial={false}>
+                {expandedRow === idx && (
+                  <tr>
+                    <td colSpan={6} className="px-6 pb-8 pt-0 border-none">
+                      <Motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ 
+                            height: "auto", 
+                            opacity: 1,
+                            transition: {
+                              height: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                              opacity: { duration: 0.3, delay: 0.1 }
+                            }
+                          }}
+                          exit={{ 
+                            height: 0, 
+                            opacity: 0,
+                            transition: {
+                              height: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+                              opacity: { duration: 0.2 }
+                            }
+                          }}
+                          className="overflow-hidden" // Para hindi mag-overlap ang content habang nag-a-animate
+                        >
+                      {/* Main Container with Glass Effect */}
+                      <div className="bg-linear-to-b from-white to-slate-50/50 border-x border-b border-slate-100 rounded-b-[3.5rem] shadow-2xl shadow-slate-200/60 p-10 pt-6">
+                        
+                        {/* TOP BAR: Enhanced Header & Quick Action */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                          <div className="flex items-center gap-5">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-3 transition-transform group-hover:rotate-0 ${
+                              service.rating >= 4 ? 'bg-emerald-500 shadow-emerald-200' : 'bg-indigo-500 shadow-indigo-200'
+                            }`}>
+                              <BarChart3 className="text-white" size={28} />
+                            </div>
+                            <div>
+                              <h4 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
+                                Deep-Dive Analytics
+                              </h4>
+                              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                Live Audit: {service.name}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <button className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-[11px] font-black text-slate-600 uppercase tracking-widest hover:bg-slate-50 hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm active:scale-95">
+                            Generate Report
+                          </button>
+                        </div>
+
+                        {/* ANALYTICS GRID */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                          
+                          {/* 1. RADIAL AWARENESS: Premium Gauge Look */}
+                          <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm relative overflow-hidden group hover:border-indigo-100 transition-colors">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                              <Users size={80} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-6 block">Awareness Score</span>
+                            
+                            <div className="h-44 w-full relative">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <RadialBarChart 
+                                  innerRadius="80%" outerRadius="110%" 
+                                  data={[{ value: service.cc_awareness * 100, fill: service.cc_awareness > 0.7 ? '#6366f1' : '#f43f5e' }]} 
+                                  startAngle={210} endAngle={-30}
+                                >
+                                  <RadialBar dataKey="value" cornerRadius={20} />
+                                </RadialBarChart>
+                              </ResponsiveContainer>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-4xl font-black text-slate-900 leading-none">{(service.cc_awareness * 100).toFixed(0)}%</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase mt-1">Target Reached</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. SENTIMENT FLOW: Friction Analysis */}
+                          <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm relative group hover:border-rose-100 transition-colors">
+                            <div className="flex justify-between items-start mb-8">
+                              <div>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] block">Friction Level</span>
+                                <h5 className={`text-xl font-black mt-1 ${service.negative > 15 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                                  {service.negative > 15 ? 'High Risk' : 'Optimal'}
+                                </h5>
+                              </div>
+                              <div className={`p-2 rounded-lg ${service.negative > 15 ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                <Activity size={20} />
+                              </div>
+                            </div>
+                            
+                            <div className="h-32 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={[{v:10}, {v:18}, {v:service.negative}, {v:service.negative - 2}, {v:service.negative + 3}]}>
+                                  <defs>
+                                    <linearGradient id="colorFriction" x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="5%" stopColor={service.negative > 15 ? "#f43f5e" : "#10b981"} stopOpacity={0.2}/>
+                                      <stop offset="95%" stopColor={service.negative > 15 ? "#f43f5e" : "#10b981"} stopOpacity={0}/>
+                                    </linearGradient>
+                                  </defs>
+                                  <Area type="monotone" dataKey="v" stroke={service.negative > 15 ? "#f43f5e" : "#10b981"} strokeWidth={4} fill="url(#colorFriction)" />
+                                </AreaChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+
+                          {/* 3. PERFORMANCE BENCHMARK: Modern Scale */}
+                          <div className="bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden">
+                            {/* Background Decorative Circles */}
+                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl" />
+                            
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-6 block">Benchmark Analysis</span>
+                            
+                            <div className="space-y-6">
+                              <div className="flex justify-between items-end">
+                                <div>
+                                  <span className="text-5xl font-black text-white tracking-tighter">{service.rating.toFixed(2)}</span>
+                                  <span className="text-slate-500 font-bold ml-2">/ 5.0</span>
+                                </div>
+                                <div className={`flex flex-col items-end ${service.rating >= 3.5 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                  <span className="text-[10px] font-black uppercase italic">Performance</span>
+                                  <span className="text-lg font-black">{service.rating >= 3.5 ? 'A+' : 'B-'}</span>
+                                </div>
+                              </div>
+
+                              <div className="relative pt-2">
+                                <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700 p-1">
+                                  <div 
+                                    className={`h-full rounded-full transition-all duration-1500 cubic-bezier(0.34, 1.56, 0.64, 1) ${
+                                      service.rating >= 4 ? 'bg-linear-to-r from-emerald-500 to-teal-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 
+                                      service.rating >= 3 ? 'bg-linear-to-r from-indigo-500 to-blue-400' : 'bg-linear-to-r from-rose-500 to-orange-400'
+                                    }`} 
+                                    style={{ width: `${(service.rating / 5) * 100}%` }}
+                                  />
+                                </div>
+                                {/* Benchmark Marker */}
+                                <div className="absolute top-0 left-[80%] h-8 border-l-2 border-white/20 flex flex-col items-center">
+                                  <span className="text-[8px] font-black text-slate-500 uppercase mt-8">Avg</span>
+                                </div>
+                              </div>
+                              
+                              <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                                Currently performing <span className="text-white font-bold">{service.rating >= 4 ? 'above' : 'near'}</span> the municipal baseline for service delivery.
+                              </p>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                      </Motion.div>
+                    </td>
+                  </tr>
+                )}
+                </AnimatePresence>
                 </Fragment>
               ))}
             </tbody>
