@@ -7,6 +7,7 @@ protobuf==3.20.3
 python-dotenv
 googletrans==4.0.0-rc1
 apscheduler
+mysql-connector-python
 
 
 

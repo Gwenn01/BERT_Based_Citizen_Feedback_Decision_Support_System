@@ -61,3 +61,17 @@ def fetch_feedback_by_service(service_id):
     cursor.close()
     conn.close()
     return feedback
+
+
+def update_feedback_status(feedback_id, sentiment_label, confidence):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "UPDATE feedback SET sentiment = %s, confidence = %s WHERE feedback_id = %s",
+        (sentiment_label,confidence, feedback_id)
+    )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
