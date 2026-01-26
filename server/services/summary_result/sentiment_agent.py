@@ -1,46 +1,45 @@
 from ai.bert_model import predict_sentiment
 
-def analyze_sentiment(comments):
-    if not comments:
+def analyze_sentiment(feedback_rows):
+    counts = {"positive": 0, "neutral": 0, "negative": 0}
+
+    if not feedback_rows:
         return {
             "total": 0,
-            "counts": {},
-            "percentages": {},
-            "average_confidence": 0
+            "counts": counts,
+            "percentages": counts.copy(),
+            "average_confidence": 0,
+            "sentiment_score": 0
         }
 
-    counts = {
-        "Positive": 0,
-        "Neutral": 0,
-        "Negative": 0
-    }
+    total_confidence = 0.0
+    total = len(feedback_rows)
 
-    total_confidence = 0
-    valid = 0
+    for row in feedback_rows:
+        sentiment = (row.get("sentiment") or "neutral").lower()
+        if sentiment not in counts:
+            sentiment = "neutral"
 
-    for text in comments:
-        result = predict_sentiment(text)
-
-        label = result.get("label", "Neutral")
-        confidence = result.get("confidence", 0)
-
-        if label not in counts:
-            label = "Neutral"
-
-        counts[label] += 1
-        total_confidence += confidence
-        valid += 1
+        counts[sentiment] += 1
+        total_confidence += float(row.get("confidence") or 0)
 
     percentages = {
-        k: round((v / valid) * 100, 2) if valid else 0
+        k: round((v / total) * 100, 2)
         for k, v in counts.items()
     }
-    sentiment_score = (((round(total_confidence / valid, 2) if valid else 0) + 1) / 2) * 100
+
+    average_confidence = round(total_confidence / total, 2)
+
+    sentiment_score = round(
+        ((counts["positive"] - counts["negative"]) / total + 1) * 50,
+        2
+    )
+
     return {
-        "total": valid,
+        "total": total,
         "counts": counts,
         "percentages": percentages,
-        "sentiment_score": sentiment_score,
-        "average_confidence": round(total_confidence / valid, 2) if valid else 0
+        "average_confidence": average_confidence,
+        "sentiment_score": sentiment_score
     }
 

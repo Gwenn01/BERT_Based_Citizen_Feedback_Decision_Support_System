@@ -18,11 +18,11 @@ def detect_issues(data):
             })
 
     # 2. Negative sentiment issue
-    if sentiment["percentages"]["Negative"] > HIGH_NEGATIVE_SENTIMENT:
+    if sentiment["percentages"]["negative"] > HIGH_NEGATIVE_SENTIMENT:
         issues.append({
             "category": "Public Satisfaction",
             "dimension": "Overall Service Experience",
-            "value": sentiment["percentages"]["Negative"],
+            "value": sentiment["percentages"]["negative"],
             "severity": "Critical"
         })
 

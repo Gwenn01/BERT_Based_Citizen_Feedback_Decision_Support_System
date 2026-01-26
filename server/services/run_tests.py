@@ -19,6 +19,8 @@ def run_services_tests():
     comments = []
     cc_data = []
     
+    #print(analyze_sentiment(feedback))
+    
     # result = analyze_survey(feedback)
     # print("Fetched Survey:", result)
     

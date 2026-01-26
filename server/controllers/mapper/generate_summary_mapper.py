@@ -56,16 +56,13 @@ def generate_period_summary(period_type, start_date, end_date):
         return {"message": "No feedback available"}
     
     # 2. Analyze
-    comments = []
     cc_data = []
     data = {}
     
     result_survey = analyze_survey(feedback)
     data["survey"] = result_survey
     
-    for f in feedback:
-       comments.append(translate_filipino_to_english(f["comment"]))
-    result_sentiment = analyze_sentiment(comments)
+    result_sentiment = analyze_sentiment(feedback)
     data["sentiment"] = result_sentiment
     
     for f in feedback:
@@ -75,6 +72,7 @@ def generate_period_summary(period_type, start_date, end_date):
             "cc3": f["cc3"]
         })
     result_awareness = analyze_citizens_charter(cc_data)
+    print(result_awareness)
     data["awareness"] = result_awareness
     
     # 3. Build summary payload

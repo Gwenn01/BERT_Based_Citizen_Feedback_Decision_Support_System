@@ -91,12 +91,12 @@ def insert_summary(data):
         """, (
             period_id,
             sentiment["total"],
-            sentiment["counts"]["Positive"],
-            sentiment["counts"]["Neutral"],
-            sentiment["counts"]["Negative"],
-            sentiment["percentages"]["Positive"],
-            sentiment["percentages"]["Neutral"],
-            sentiment["percentages"]["Negative"],
+            sentiment["counts"]["positive"],
+            sentiment["counts"]["neutral"],
+            sentiment["counts"]["negative"],
+            sentiment["percentages"]["positive"],
+            sentiment["percentages"]["neutral"],
+            sentiment["percentages"]["negative"],
             sentiment["sentiment_score"],
             sentiment["average_confidence"]
         ))
