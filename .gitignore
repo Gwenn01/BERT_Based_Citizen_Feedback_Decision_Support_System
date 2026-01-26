@@ -25,5 +25,9 @@ server/myHug.txt
 
 bert_sentiment_model/
 server/ai/bert_sentiment_model/
+*.bin
+*.pt
+*.safetensors
+*.ckpt
 
 
