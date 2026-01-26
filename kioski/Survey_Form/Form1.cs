@@ -1,7 +1,9 @@
-﻿using System.Drawing.Printing;
-using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.IO;
 
 namespace Survey_Form
 {
@@ -14,6 +16,8 @@ namespace Survey_Form
             InitializeComponent();
             ApplyModernUI();
             InitializeCheckboxLogic();
+
+            AttachKeyboard(this);
 
             // Attach submit button event
             btnSubmit.Click += BtnSubmit_Click;
@@ -146,6 +150,47 @@ namespace Survey_Form
                 return false;
             }
         }
+
+        private void ShowOnScreenKeyboard()
+        {
+            try
+            {
+                string oskPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.System),
+                    "osk.exe"
+                );
+
+                if (Process.GetProcessesByName("osk").Length == 0)
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = oskPath,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to open on-screen keyboard.\n" + ex.Message);
+            }
+        }
+
+        private void AttachKeyboard(Control parent)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                if (c is TextBox)
+                {
+                    c.Enter += (s, e) => ShowOnScreenKeyboard();
+                }
+
+                if (c.HasChildren)
+                {
+                    AttachKeyboard(c);
+                }
+            }
+        }
+
 
         // ========== VALIDATION ==========
         private bool ValidateForm()

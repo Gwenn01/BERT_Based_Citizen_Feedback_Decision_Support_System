@@ -607,7 +607,7 @@
             // 
             grpComplaints.Controls.Add(txtComment);
             grpComplaints.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            grpComplaints.Location = new Point(30, 1379);
+            grpComplaints.Location = new Point(30, 1393);
             grpComplaints.Name = "grpComplaints";
             grpComplaints.Size = new Size(969, 94);
             grpComplaints.TabIndex = 8;
@@ -628,7 +628,7 @@
             // 
             grpContactInfo.Controls.Add(txtContactInfo);
             grpContactInfo.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            grpContactInfo.Location = new Point(30, 1498);
+            grpContactInfo.Location = new Point(29, 1493);
             grpContactInfo.Name = "grpContactInfo";
             grpContactInfo.Size = new Size(969, 79);
             grpContactInfo.TabIndex = 9;
@@ -639,9 +639,10 @@
             // 
             txtContactInfo.BorderStyle = BorderStyle.FixedSingle;
             txtContactInfo.Font = new Font("Segoe UI", 8F);
-            txtContactInfo.Location = new Point(11, 34);
+            txtContactInfo.Location = new Point(11, 22);
+            txtContactInfo.Multiline = true;
             txtContactInfo.Name = "txtContactInfo";
-            txtContactInfo.Size = new Size(942, 22);
+            txtContactInfo.Size = new Size(942, 39);
             txtContactInfo.TabIndex = 0;
             // 
             // pictureBox1
@@ -1513,7 +1514,7 @@
             btnSubmit.BackColor = Color.DodgerBlue;
             btnSubmit.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnSubmit.ForeColor = Color.White;
-            btnSubmit.Location = new Point(366, 1606);
+            btnSubmit.Location = new Point(390, 1587);
             btnSubmit.Name = "btnSubmit";
             btnSubmit.Size = new Size(294, 71);
             btnSubmit.TabIndex = 23;
