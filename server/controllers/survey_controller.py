@@ -3,6 +3,8 @@ from flask import request, jsonify
 from model.insert_feedback import insert_feedback
 from middlewares.validate_feedback import validate_feedback
 from controllers.mapper.service_id_mapper import get_service_id
+from ai.bert_model import predict_sentiment
+
 
 def handle_survey_submission():
     try:
@@ -16,6 +18,11 @@ def handle_survey_submission():
         
         if not service_id:
             return jsonify({"error": "Invalid office/service name"}), 400
+        
+        sentiment = predict_sentiment(data["comment"])
+
+        data["sentiment"] = sentiment["label"].lower()
+        data["confidence"] = float(sentiment["confidence"])
         
         feedback_id = insert_feedback(service_id, data)
         return jsonify({"message": "Feedback submitted successfully", "feedback_id": feedback_id}), 201

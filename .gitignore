@@ -23,5 +23,7 @@ build/
 server/token.txt
 server/myHug.txt
 
+bert_sentiment_model/
+server/ai/bert_sentiment_model/
 
 

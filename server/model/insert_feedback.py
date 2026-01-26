@@ -11,14 +11,14 @@ def insert_feedback(service_id,feedback_data):
             cc1, cc2, cc3,
             responsiveness, reliability, facilities, communication,
             costs, integrity, assurance, outcome,
-            comment, email, phone_number, service_date
+            comment, sentiment, confidence, email, phone_number, service_date
         ) VALUES (
             %s, %s, %s, %s, %s, %s,
             %s, %s,
             %s, %s, %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s,
-            %s, %s, %s, %s
+            %s, %s, %s, %s, %s, %s
         )
     """
 
@@ -47,6 +47,8 @@ def insert_feedback(service_id,feedback_data):
         feedback_data["outcome"],
 
         feedback_data.get("comment"),
+        feedback_data.get("sentiment"),
+        feedback_data.get("confidence"),
         feedback_data.get("email"),
         feedback_data.get("phone_number"),
         feedback_data["service_date"]

@@ -139,7 +139,11 @@ def run_services_tests():
     #         sentiment_label,
     #         confidence 
     #     )
-
+    update_feedback_status(
+            94,            #
+            "negative",
+            float(0.9999)
+    )
     
     # print(normalize_text("Sobrang bilis at napakabait ng staff. Excellent serbisyo!"))
     # nor = normalize_text("Sobrang bilis at napakabait ng staff. Excellent serbisyo!")
