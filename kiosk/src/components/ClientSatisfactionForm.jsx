@@ -99,10 +99,76 @@ const ClientSatisfactionForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Submitted:', JSON.stringify(formData, null, 2));
-    alert("Form submitted! Check console for data.");
+    
+    try {
+      // Show loading state
+      const submitButton = e.target.querySelector('button[type="submit"]');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Submitting...';
+      submitButton.disabled = true;
+
+      // Send data to backend
+      const response = await fetch('http://127.0.0.1:5000/api/get-survey-client', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Server response:', result);
+      
+      alert("Form submitted successfully!");
+      
+      // Reset form after successful submission
+      setFormData({
+        client_type: '',
+        place: '',
+        gender: '',
+        age: '',
+        office: '',
+        service_date: new Date().toISOString().split('T')[0],
+        service_type: '',
+        employee_name: '',
+        cc1: '',
+        cc2: '',
+        cc3: '',
+        responsiveness: '',
+        reliability: '',
+        facilities: '',
+        communication: '',
+        costs: '',
+        integrity: '',
+        assurance: '',
+        outcome: '',
+        comment: '',
+        email: '',
+        phone_number: ''
+      });
+
+      // Reset button state
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert(`Error submitting form: ${error.message}`);
+      
+      // Reset button state on error
+      const submitButton = e.target.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.textContent = 'Submit';
+        submitButton.disabled = false;
+      }
+    }
   };
 
   return (
