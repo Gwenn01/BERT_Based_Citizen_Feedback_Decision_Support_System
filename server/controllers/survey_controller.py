@@ -5,6 +5,7 @@ from middlewares.validate_feedback import validate_feedback
 from controllers.mapper.service_id_mapper import get_service_id
 from ai.bert_model import predict_sentiment
 from controllers.mapper.generate_summary_mapper import generate_period_summary
+from controllers.mapper.genarate_service_performance_mapper import get_service_performance
 from datetime import date, timedelta
 import traceback
 
@@ -47,6 +48,7 @@ def handle_survey_submission():
             start_date=start_date,
             end_date=today
         )
+        get_service_performance()
         return jsonify({
             "message": "Feedback submitted successfully",
             "feedback_id": feedback_id

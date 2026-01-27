@@ -11,17 +11,16 @@ def get_service_performance():
     for s in services:
         feedback_by_service = get_feedback_by_service(s['service_id'])
         cc_data = []
-        comments = []
         for f in feedback_by_service:
             cc_data.append({
                 "cc1": f["cc1"],
                 "cc2": f["cc2"],
                 "cc3": f["cc3"]
             })
-            comments.append(f["comment"])
+           
         feedback_cc_avg = analyze_citizens_charter(cc_data)
         feedback_survey_avg = analyze_survey(feedback_by_service)
-        feedback_sentiment = analyze_sentiment(comments)
+        feedback_sentiment = analyze_sentiment(feedback_by_service)
         data[s['service_name']] = {
             "citizens_charter_awareness": round(feedback_cc_avg["overall_awareness"],),
             "survey_analysis": round(feedback_survey_avg["overall_avg"], 2),
