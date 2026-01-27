@@ -269,6 +269,19 @@ const AdminOverview = () => {
             item.sentiment?.toLowerCase() === selectedSentiment.toLowerCase()
         );
 
+  const handleSentimentSelect = (type) => {
+    const newSentiment = selectedSentiment === type ? "all" : type;
+      setSelectedSentiment(newSentiment);
+
+    const tableSection = document.getElementById('feedback');
+    if (tableSection) {
+      tableSection.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900 overflow-x-hidden">
       {/* Main Container - Matched max-width and vertical padding */}
@@ -319,10 +332,7 @@ const AdminOverview = () => {
               statusLabel={kpi.statusLabel}
               isSentimentCard={kpi.title.toLowerCase().includes("sentiment")}
               activeSentiment={selectedSentiment}
-              onSentimentSelect={(sentiment) =>
-                setSelectedSentiment((prev) =>
-                 prev === sentiment ? "all" : sentiment
-                )}
+              onSentimentSelect={handleSentimentSelect}
             />
           ))}
         </div>
@@ -726,254 +736,286 @@ const AdminOverview = () => {
           </div>
 
           <div className="lg:col-span-12 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
-            {/* Table Header Section */}
-            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
-              <div className="space-y-1">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                  Recent Feedback Activity
-                </h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                  <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                  Live Citizen Responses
-                </p>
-              </div>
+          {/* Table Header Section */}
+          <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                Recent Feedback Activity
+              </h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                Live Citizen Responses
+              </p>
             </div>
+          </div>
 
-            <div className="px-4 pb-4 mt-2 w-full overflow-hidden">
-            <table className="w-full text-left border-separate border-spacing-y-2 table-auto">
+          <div className="px-4 pb-4 mt-2 w-full overflow-hidden scroll-mt-40" id="feedback">
+            {filteredFeedback.length > 0 ? (
+            <table className="w-full text-left border-separate border-spacing-y-2 table-fixed">
               <thead>
                 <tr className="text-slate-400">
-                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Citizen / User
-                  </th>
-                  <th className="w-[25%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Feedback Detail
-                  </th>
-                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Service Area
-                  </th>
-                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Bert Sentiment Analysis
-                  </th>
-                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Timestamp
-                  </th>
+                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Citizen</th>
+                  <th className="w-[30%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Feedback Detail</th>
+                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Service</th>
+                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Sentiment</th>
+                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">AI Info</th>
+                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Timestamp</th>
                 </tr>
               </thead>
               <tbody className="divide-y-0">
                 {filteredFeedback.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="group transition-all duration-300 hover:scale-[1.005]"
-                  >
-                    {/* User / Client Info */}
-                    <td className="px-6 py-5 bg-slate-50/40 group-hover:bg-white rounded-l-4xl border-y border-l border-transparent group-hover:border-slate-200/60 transition-all duration-300">
-                      <div className="flex items-center gap-4 min-w-0">
-                        {/* Avatar Section */}
-                        <div className="relative shrink-0 group-hover:scale-105 transition-transform duration-300">
-                          <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-200/40">
-                            <span className="text-white font-bold text-sm tracking-widest">
+                  <tr key={item.id} className="group transition-all duration-500 hover:z-10 relative">
+                    
+                    {/* 1. CITIZEN PROFILE - The Static Anchor */}
+                    <td className="align-top px-8 py-10 bg-slate-50/40 group-hover:bg-white rounded-l-[2.5rem] border-y border-l border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-60">
+                      <div className="flex flex-col gap-5">
+                        <div className="relative w-fit">
+                          <div className="h-12 w-12 rounded-[1.25rem] bg-linear-to-br from-indigo-600 via-blue-600 to-violet-700 flex items-center justify-center shadow-xl shadow-indigo-200/50 group-hover:scale-105 transition-all duration-500">
+                            <span className="text-white font-black text-lg tracking-tighter italic">
                               {item.client ? item.client.charAt(0).toUpperCase() : "G"}
                             </span>
                           </div>
-                          <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-white border border-slate-100 rounded-lg flex items-center justify-center shadow-sm">
-                            <span className="text-[8px] font-black text-slate-400">#{item.id}</span>
-                          </div>
+                          <div className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-emerald-500 border-[3px] border-white rounded-full shadow-md" />
                         </div>
 
-                        {/* Info Section */}
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[15px] font-black text-slate-800 tracking-tight mb-1 group-hover:text-blue-700 transition-colors whitespace-nowrap">
+                        <div className="flex flex-col space-y-2">
+                          <span className="text-[12px] font-black text-slate-800 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors whitespace-nowrap ">
                             {item.client || "General Public"}
                           </span>
-                          <div className="flex flex-col leading-tight">
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                              Verified User
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+                              #{item.id}
                             </span>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[9px] font-medium text-slate-400 uppercase">Ref:</span>
-                              <span className="text-[9px] font-black text-indigo-500 uppercase tracking-tighter">
-                                {item.id}
-                              </span>
-                            </div>
+                            <span className="text-[6px] font-black text-indigo-400 uppercase tracking-tighter">Verified Citizen</span>
                           </div>
                         </div>
                       </div>
                     </td>
 
-                    {/* Feedback Text Column */}
-                    <td className="px-8 py-6 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-300">
-                      <div className="relative flex flex-col gap-3 min-w-0">
-                        <div className="relative z-10">
-                          <p className="text-[14px] text-slate-600 font-semibold leading-relaxed tracking-tight group-hover:text-slate-900 transition-colors duration-300">
-                            <span className="text-blue-500/40 font-serif text-lg mr-1 group-hover:text-blue-500 transition-colors">“</span>
+                    {/* 2. FEEDBACK TEXT - The Dynamic Content */}
+                    <td className="align-top px-10 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500">
+                      <div className="flex flex-col gap-6 max-w-lg">
+                        <div className="relative">
+                          {/* Elegant Side Quote Accent */}
+                          <div className="absolute -left-5 top-0 bottom-0 w-0.5 bg-linear-to-b from-transparent via-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                          
+                          <p className="text-[12px] text-slate-600 font-medium leading-[1.7] tracking-wide group-hover:text-slate-900 transition-colors duration-500 antialiased">
+                            <span className="text-indigo-500/40 font-serif text-2xl mr-1 inline-block translate-y-1">“</span>
                             {item.text}
-                            <span className="text-blue-500/40 font-serif text-lg ml-1 group-hover:text-blue-500 transition-colors">”</span>
+                            <span className="text-indigo-500/40 font-serif text-2xl ml-1 inline-block translate-y-1">”</span>
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="h-0.5 w-4 bg-slate-200 group-hover:w-8 group-hover:bg-blue-400 transition-all duration-500" />
-                          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-300 group-hover:text-blue-500 transition-colors">
-                            Full Citizen Testimony
+                      </div>
+                    </td>
+
+                    {/* 3. SERVICE AREA - Grid-Locked badge */}
+                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-45">
+                      <div className="flex flex-col gap-4">
+                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">Service Dept</span>
+                        <div className="group/badge relative w-fit">
+                          <span className="relative z-10 inline-flex items-center px-4 py-2 bg-white border border-slate-200/80 text-[9px] font-black text-slate-700 rounded-xl uppercase tracking-wider whitespace-nowrap group-hover:border-indigo-400 group-hover:text-indigo-600 group-hover:shadow-md transition-all duration-300">
+                            {item.service}
                           </span>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-500">
-                    <div className="flex flex-col gap-1.5">
-                      {/* Label Header - Small detail that adds professionalism */}
-                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.25em] pl-1">
-                        Department
-                      </span>
-
-                      <div className="flex items-center gap-3">
-                        {/* Premium Indicator: Mas malinis na Pulse at Glow */}
-                        <div className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-30"></span>
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.6)]"></span>
-                        </div>
-
-                        {/* Modern Badge Style */}
-                        <div className="relative group/badge">
-                          <span className="
-                            inline-flex items-center px-3.5 py-1.5 
-                            bg-white/80 backdrop-blur-sm 
-                            border border-slate-200/80 
-                            text-[11px] font-black text-slate-700 
-                            rounded-xl uppercase tracking-wider
-                            shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)]
-                            group-hover:border-indigo-300 group-hover:text-indigo-700 
-                            group-hover:shadow-indigo-100/50
-                            transition-all duration-300 whitespace-nowrap
-                          ">
-                            {item.service}
-                          </span>
-                          
-                          {/* Subtle Bottom Glow on Hover */}
-                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-px bg-linear-to-r from-transparent via-indigo-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* 4. SENTIMENT - High Fidelity Badge */}
+                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-40">
+                      <div className="flex flex-col gap-4">
+                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">BERT Insight</span>
+                        <div className={`
+                              relative inline-flex items-center gap-3 px-4 py-2 rounded-xl border transition-all duration-500 w-fit
+                              ${item.sentiment?.toLowerCase() === 'positive' 
+                                ? 'bg-emerald-50/50 border-emerald-200/50 text-emerald-700' 
+                                : item.sentiment?.toLowerCase() === 'neutral'
+                                  ? 'bg-amber-50/50 border-amber-200/50 text-amber-700'
+                                  : 'bg-rose-50/50 border-rose-200/50 text-rose-700'}
+                              group-hover:shadow-lg
+                            `}>
+                              <span className={`h-2 w-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(var(--color-pulse))]
+                                ${item.sentiment?.toLowerCase() === 'positive' 
+                                  ? 'bg-emerald-500' 
+                                  : item.sentiment?.toLowerCase() === 'neutral'
+                                    ? 'bg-amber-500'
+                                    : 'bg-rose-500'}
+                              `} />
+                          <span className="text-[9px] font-black uppercase tracking-widest">{item.sentiment}</span>
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                   <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all duration-500">
-                    <div className="flex items-center">
-                      {/* Premium Floating Badge */}
-                      <div className={`
-                        relative flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-500
-                        ${item.sentiment?.toLowerCase() === 'positive' 
-                          ? 'bg-emerald-50/30 border-emerald-200/50 text-emerald-700 shadow-[0_4px_12px_-2px_rgba(16,185,129,0.12)]' 
-                          : 'bg-rose-50/30 border-rose-200/50 text-rose-700 shadow-[0_4px_12px_-2px_rgba(244,63,94,0.12)]'
-                        }
-                        group-hover:-translate-y-px group-hover:shadow-md
-                      `}>
+                    {/* 5. AI GAUGE - Modern Linear Version */}
+                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-40">
+                      <div className="flex flex-col gap-4">
+                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">AI Confidence</span>
                         
-                        {/* Precision Status Indicator */}
-                        <div className="relative flex h-2 w-2">
-                          <span className={`
-                            absolute inline-flex h-full w-full rounded-full opacity-40 animate-pulse
-                            ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-400' : 'bg-rose-400'}
-                          `}></span>
-                          <span className={`
-                            relative inline-flex rounded-full h-2 w-2 
-                            ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-500' : 'bg-rose-500'}
-                          `}></span>
+                        <div className="flex flex-col gap-2.5">
+                          {/* Score and Label */}
+                          <div className="flex items-end justify-between pr-2">
+                            <span className={`text-[12px] font-black leading-none tabular-nums
+                              ${parseFloat(item.confidence) >= 0.85 ? 'text-emerald-600' 
+                                : parseFloat(item.confidence) >= 0.60 ? 'text-amber-600' 
+                                : 'text-rose-600'}`}>
+                              {Math.round(parseFloat(item.confidence) * 100)}%
+                            </span>
+                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                              {parseFloat(item.confidence) >= 0.85 ? 'High' 
+                                : parseFloat(item.confidence) >= 0.60 ? 'Mid' 
+                                : 'Low'}
+                            </span>
+                          </div>
+
+                          {/* Modern Segmented Progress Bar - Dynamic Fill Version */}
+                          <div className="flex gap-1.5 h-1.5 w-full max-w-27.5">
+                            {[0, 1, 2].map((i) => {
+                              const segmentSize = 1 / 3; 
+                              const segmentStart = i * segmentSize;
+                              const rawFill = (parseFloat(item.confidence) - segmentStart) / segmentSize;
+                              const fillWidth = Math.min(Math.max(rawFill * 100, 0), 100);
+
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="h-full flex-1 bg-slate-100 rounded-full overflow-hidden relative"
+                                >
+                                  {/* Ang active "Fill" layer */}
+                                  <div 
+                                    className={`h-full transition-all duration-1000 ease-out rounded-full
+                                      ${parseFloat(item.confidence) >= 0.85 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' 
+                                        : parseFloat(item.confidence) >= 0.60 ? 'bg-amber-500' 
+                                        : 'bg-rose-500'}`}
+                                    style={{ 
+                                      width: `${fillWidth}%`,
+                                      transitionDelay: `${i * 150}ms` 
+                                    }}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Subtle Bottom Label */}
+                          <span className="text-[5px] font-bold text-slate-300 uppercase italic tracking-tighter">
+                            BERT Scoring Model
+                          </span>
                         </div>
-
-                        {/* Typography: Clean and High-Tracking */}
-                        <span className="text-[11px] font-black uppercase tracking-[0.2em] antialiased">
-                          {item.sentiment}
-                        </span>
-
-                        {/* Subtle Inner Glow - makes it look 3D/Glassy */}
-                        <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-white/40 to-transparent pointer-events-none" />
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                    {/* Time Received Column */}
-                    <td className="px-6 py-5 bg-slate-50/50 group-hover:bg-white rounded-r-4xl border-y border-r border-transparent group-hover:border-slate-200/60 transition-all duration-300">
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col items-center gap-1 shrink-0">
-                          <div className="h-1.5 w-1.5 rounded-full bg-blue-500/20 group-hover:bg-blue-500 transition-colors duration-500" />
-                          <div className="h-8 w-px bg-slate-200 group-hover:bg-blue-100 transition-colors duration-500" />
-                        </div>
-
-                        <div className="flex flex-col justify-center min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <svg className="w-3 h-3 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m4-2a8 8 0 11-16 0 8 8 0 0116 0z" />
-                            </svg>
-                            <span className="text-[13px] font-black text-slate-700 tracking-tight tabular-nums group-hover:text-slate-900 transition-colors truncate">
+                    {/* 6. TIMELINE - Elegant Micro-Clock */}
+                    <td className="align-top px-8 py-10 bg-slate-50/40 group-hover:bg-white rounded-r-[2.5rem] border-y border-r border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-45">
+                      <div className="flex flex-col gap-4">
+                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">Timeline</span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-indigo-50 transition-colors">
+                              <svg className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <span className="text-[12px] font-black text-slate-800 tabular-nums whitespace-nowrap">
                               {item.time}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[9px] text-slate-400 uppercase font-black tracking-[0.15em]">Received</span>
-                            <span className="px-1.5 py-0.5 bg-slate-100 rounded text-[8px] font-bold text-slate-500 uppercase group-hover:bg-blue-50 group-hover:text-blue-600">Live</span>
+                          <div className="flex items-center gap-2 ml-1 mt-1">
+                            <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest ">Received Live</span>
                           </div>
                         </div>
                       </div>
                     </td>
+
                   </tr>
                 ))}
-                {filteredFeedback.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="py-24 px-6">
-                      <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
-                        
-                        {/* Decorative Icon Container */}
-                        <div className="relative mb-6">
-                          {/* Subtle Outer Glow */}
-                          <div className="absolute inset-0 bg-slate-200/50 rounded-full blur-3xl scale-150" />
-                          
-                          <div className="relative h-20 w-20 bg-white border border-slate-100 rounded-4xl shadow-xl flex items-center justify-center overflow-hidden">
-                            {/* Animated Background Pulse */}
-                            <div className="absolute inset-0 bg-linear-to-tr from-slate-50 to-white" />
-                            
-                            <MessageSquare 
-                              size={32} 
-                              className={`relative z-10 transition-colors duration-500 ${
-                                selectedSentiment === 'positive' ? 'text-emerald-400' : 
-                                selectedSentiment === 'negative' ? 'text-rose-400' : 
-                                selectedSentiment === 'neutral' ? 'text-amber-400' : 'text-slate-300'
-                              }`} 
-                            />
-                            
-                            {/* Small floating dots for "searching" effect */}
-                            <div className="absolute top-3 right-3 h-1.5 w-1.5 bg-blue-400 rounded-full animate-ping" />
-                          </div>
-                        </div>
-
-                        {/* Text Content */}
-                        <div className="text-center space-y-2 relative z-10">
-                          <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">
-                            No {selectedSentiment !== 'all' ? selectedSentiment : ''} records found
-                          </h3>
-                          <p className="text-sm text-slate-400 font-medium max-w-70 leading-relaxed">
-                            We couldn't find any feedback matching the current filters. Try selecting a different category or time range.
-                          </p>
-                        </div>
-
-                        {/* Reset Action Button */}
-                        <button
-                          onClick={() => setSelectedSentiment("all")}
-                          className="mt-8 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-slate-200 hover:bg-blue-600 hover:shadow-blue-100 hover:-translate-y-0.5 transition-all duration-300"
-                        >
-                          Clear All Filters
-                        </button>
-
-                        {/* Aesthetic Detail: Bottom Line */}
-                        <div className="w-16 h-1 bg-slate-100 rounded-full mt-10" />
-                      </div>
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
+            ) : (
+              (() => {
+                const theme = {
+                  all: { text: "indigo", bg: "indigo", glow: "bg-indigo-400", border: "border-indigo-100" },
+                  positive: { text: "emerald", bg: "emerald", glow: "bg-emerald-400", border: "border-emerald-100" },
+                  neutral: { text: "amber", bg: "amber", glow: "bg-amber-400", border: "border-amber-100" },
+                  negative: { text: "rose", bg: "rose", glow: "bg-rose-400", border: "border-rose-100" },
+                }[selectedSentiment?.toLowerCase()] || { text: "indigo", bg: "indigo", glow: "bg-indigo-400", border: "border-indigo-100" };
+
+                return (
+                  <div className="relative group overflow-hidden flex flex-col items-center justify-center py-32 px-6 bg-linear-to-b from-slate-50/50 to-white rounded-[3.5rem] border border-slate-200/60 shadow-[0_20px_50px_-20px_rgba(226,232,240,0.5)] transition-all duration-700">
+                    
+                    {/* 1. Dynamic Mesh Background */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden opacity-30">
+                      <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] ${theme.glow} blur-[100px] rounded-full animate-pulse`} />
+                      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100/40 blur-[100px] rounded-full animate-pulse delay-700" />
+                    </div>
+
+                    {/* 2. Central Visual Unit */}
+                    <div className="relative mb-10">
+                      {/* Concentric Rotating Rings */}
+                      <div className="absolute inset-0 -m-6 border border-slate-200/50 rounded-[3rem] animate-[spin_20s_linear_infinite]" />
+                      <div className={`absolute inset-0 -m-10 border ${theme.border}/40 rounded-[3.5rem] animate-[spin_30s_linear_infinite_reverse]`} />
+                      
+                      {/* Floating Icon Container */}
+                      <div className="relative h-28 w-28 rounded-[2.5rem] bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.08)] flex items-center justify-center border border-slate-100 group-hover:scale-105 group-hover:rotate-3 transition-all duration-700">
+                        
+                        {/* Dynamic Scanning Laser Line */}
+                        <div className={`absolute inset-x-4 h-0.5 bg-linear-to-r from-transparent via-${theme.text}-500 to-transparent top-0 animate-[scan_3s_ease-in-out_infinite]`} />
+                        
+                        <svg 
+                          className={`w-12 h-12 text-slate-300 group-hover:text-${theme.text}-500 transition-colors duration-500`} 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor" 
+                          strokeWidth="1.2"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        
+                        {/* Dynamic Status Indicators */}
+                        <div className="absolute -bottom-2 -right-2 flex gap-1 bg-white p-2 rounded-xl shadow-lg border border-slate-50">
+                          <div className={`h-2 w-2 rounded-full transition-all duration-500 ${selectedSentiment === 'positive' || selectedSentiment === 'all' ? 'bg-emerald-400 animate-bounce' : 'bg-slate-200 opacity-40'}`} />
+                          <div className={`h-2 w-2 rounded-full transition-all duration-500 delay-150 ${selectedSentiment === 'neutral' || selectedSentiment === 'all' ? 'bg-amber-400 animate-bounce' : 'bg-slate-200 opacity-40'}`} />
+                          <div className={`h-2 w-2 rounded-full transition-all duration-500 delay-300 ${selectedSentiment === 'negative' || selectedSentiment === 'all' ? 'bg-rose-400 animate-bounce' : 'bg-slate-200 opacity-40'}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Dynamic Text Content */}
+                    <div className="text-center space-y-4 max-w-md relative">
+                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-${theme.text}-50 border border-${theme.text}-100 mb-2 transition-colors duration-500`}>
+                        <span className="relative flex h-2 w-2">
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-${theme.text}-400 opacity-75`}></span>
+                          <span className={`relative inline-flex rounded-full h-2 w-2 bg-${theme.text}-500`}></span>
+                        </span>
+                        <span className={`text-[8px] font-black text-${theme.text}-600 uppercase tracking-[0.15em]`}>
+                          {selectedSentiment === 'all' ? 'System Scanning' : `${selectedSentiment} analysis active`}
+                        </span>
+                      </div>
+
+                      <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-none italic uppercase">
+                        No {selectedSentiment !== 'all' ? selectedSentiment : ''} Records Found
+                      </h3>
+                      
+                      <p className="text-[13px] text-slate-400 font-medium leading-[1.8] tracking-wide px-8">
+                        Our <span className={`text-${theme.text}-600 font-bold italic transition-colors`}>BERT Engine</span> has analyzed all incoming data streams but couldn't locate any feedback categorized as <span className="lowercase font-bold text-slate-600">{selectedSentiment === 'all' ? 'recent entries' : selectedSentiment}</span> at this moment.
+                      </p>
+                    </div>
+                    
+                    <style jsx>{`
+                      @keyframes scan {
+                        0%, 100% { top: 15%; opacity: 0; }
+                        50% { top: 85%; opacity: 1; }
+                      }
+                      @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                      }
+                    `}</style>
+                  </div>
+                );
+              })()
+            )}
           </div>
-          </div>
+        </div>
         </div>
       </div>
     </div>
