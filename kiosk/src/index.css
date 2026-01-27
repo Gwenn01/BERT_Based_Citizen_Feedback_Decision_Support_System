@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.simple-keyboard {
+  max-width: 100%;
+}
+
+.simple-keyboard .hg-button {
+  height: 45px;
+  font-size: 14px;
+}
