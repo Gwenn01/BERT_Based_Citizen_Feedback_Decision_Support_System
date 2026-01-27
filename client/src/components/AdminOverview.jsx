@@ -751,185 +751,284 @@ const AdminOverview = () => {
 
           <div className="px-4 pb-4 mt-2 w-full overflow-hidden scroll-mt-40" id="feedback">
             {filteredFeedback.length > 0 ? (
-            <table className="w-full text-left border-separate border-spacing-y-2 table-fixed">
-              <thead>
-                <tr className="text-slate-400">
-                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Citizen</th>
-                  <th className="w-[30%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Feedback Detail</th>
-                  <th className="w-[20%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Service</th>
-                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Sentiment</th>
-                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">AI Info</th>
-                  <th className="w-[15%] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y-0">
-                {filteredFeedback.map((item) => (
-                  <tr key={item.id} className="group transition-all duration-500 hover:z-10 relative">
-                    
-                    {/* 1. CITIZEN PROFILE - The Static Anchor */}
-                    <td className="align-top px-8 py-10 bg-slate-50/40 group-hover:bg-white rounded-l-[2.5rem] border-y border-l border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-60">
-                      <div className="flex flex-col gap-5">
-                        <div className="relative w-fit">
-                          <div className="h-12 w-12 rounded-[1.25rem] bg-linear-to-br from-indigo-600 via-blue-600 to-violet-700 flex items-center justify-center shadow-xl shadow-indigo-200/50 group-hover:scale-105 transition-all duration-500">
-                            <span className="text-white font-black text-lg tracking-tighter italic">
-                              {item.client ? item.client.charAt(0).toUpperCase() : "G"}
-                            </span>
-                          </div>
-                          <div className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-emerald-500 border-[3px] border-white rounded-full shadow-md" />
+            <table className="w-full text-left border-separate border-spacing-y-3">
+            <thead>
+              <tr className="text-slate-500">
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60">Citizen</th>
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60">Feedback Detail</th>
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60">Department</th>
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60">Sentiment</th>
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60">AI Confidence</th>
+                <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-[0.15em] opacity-60 text-right">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody className="before:leading-[1em] before:content-['-'] before:block before:invisible">
+              {filteredFeedback.map((item) => (
+                <tr key={item.id} className="group transition-all duration-300 hover:-translate-y-0.5">
+                  
+                  {/* 1. CITIZEN - Premium Profile Section */}
+                  <td className="px-6 py-5 bg-white border-y border-l border-slate-200/60 rounded-l-2xl group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[20%] min-w-50">
+                    <div className="flex items-center gap-4">
+                      {/* Avatar Container with Depth */}
+                      <div className="relative shrink-0">
+                        <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center relative overflow-hidden group-hover:shadow-xl group-hover:shadow-indigo-500/20 transition-all duration-500">
+                          {/* Subtle Background Pattern/Gradient */}
+                          <div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-blue-600 to-violet-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          
+                          {/* The Initial */}
+                          <span className="relative z-10 text-white font-black text-lg tracking-tight italic">
+                            {item.client ? item.client.charAt(0).toUpperCase() : "G"}
+                          </span>
+                          
+                          {/* Glass Overlay for shine */}
+                          <div className="absolute inset-0 bg-white/10 opacity-20 group-hover:rotate-12 transition-transform duration-700" />
                         </div>
 
-                        <div className="flex flex-col space-y-2">
-                          <span className="text-[12px] font-black text-slate-800 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors whitespace-nowrap ">
+                        {/* Online/Verified Pulse Indicator */}
+                        <div className="absolute -bottom-1 -right-1 flex items-center justify-center">
+                          <span className="absolute h-full w-full rounded-full bg-emerald-400 animate-ping opacity-75" />
+                          <div className="relative h-4 w-4 bg-emerald-500 border-[3px] border-white rounded-full shadow-sm" />
+                        </div>
+                      </div>
+
+                      {/* Identity Details */}
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[13px] font-black text-slate-800 truncate tracking-tight group-hover:text-indigo-600 transition-colors">
                             {item.client || "General Public"}
                           </span>
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[8px] font-bold text-slate-500 uppercase tracking-widest">
-                              #{item.id}
-                            </span>
-                            <span className="text-[6px] font-black text-indigo-400 uppercase tracking-tighter">Verified Citizen</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400 tabular-nums bg-slate-100 px-1.5 py-0.5 rounded-md">
+                            #{item.id}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <svg className="w-3 h-3 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                            </svg>
+                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-tight">Verified</span>
                           </div>
                         </div>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    {/* 2. FEEDBACK TEXT - The Dynamic Content */}
-                    <td className="align-top px-10 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500">
-                      <div className="flex flex-col gap-6 max-w-lg">
+                  {/* 2. FEEDBACK TEXT - Premium Statement Styling */}
+                  <td className="px-8 py-5 bg-white border-y border-slate-200/60 group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[30%]">
+                    <div className="relative flex items-start gap-4">
+                      
+                      {/* Elegant Vertical Accent Line */}
+                      <div className="absolute -left-4 top-1 bottom-1 w-0.75 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full w-full bg-linear-to-b from-indigo-500 to-blue-600 scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        {/* Label for context */}
+                        <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em] leading-none">
+                          Citizen Remark
+                        </span>
+
                         <div className="relative">
-                          {/* Elegant Side Quote Accent */}
-                          <div className="absolute -left-5 top-0 bottom-0 w-0.5 bg-linear-to-b from-transparent via-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                          
-                          <p className="text-[12px] text-slate-600 font-medium leading-[1.7] tracking-wide group-hover:text-slate-900 transition-colors duration-500 antialiased">
-                            <span className="text-indigo-500/40 font-serif text-2xl mr-1 inline-block translate-y-1">“</span>
+                          <p className="text-[13px] text-slate-500 font-medium leading-[1.6] tracking-tight group-hover:text-slate-900 transition-colors duration-300 antialiased italic">
+                            <span className="text-indigo-400/50 font-serif text-xl mr-1 select-none">“</span>
                             {item.text}
-                            <span className="text-indigo-500/40 font-serif text-2xl ml-1 inline-block translate-y-1">”</span>
+                            <span className="text-indigo-400/50 font-serif text-xl ml-1 select-none">”</span>
                           </p>
                         </div>
+                        
+                        {/* Interactive Tag - Optional/Extra Premium Detail */}
+                        <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                          <span className="h-1 w-1 rounded-full bg-indigo-400" />
+                          <span className="text-[8px] font-bold text-indigo-400 uppercase tracking-widest">
+                            Analyzed by BERT
+                          </span>
+                        </div>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    {/* 3. SERVICE AREA - Grid-Locked badge */}
-                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-45">
-                      <div className="flex flex-col gap-4">
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">Service Dept</span>
-                        <div className="group/badge relative w-fit">
-                          <span className="relative z-10 inline-flex items-center px-4 py-2 bg-white border border-slate-200/80 text-[9px] font-black text-slate-700 rounded-xl uppercase tracking-wider whitespace-nowrap group-hover:border-indigo-400 group-hover:text-indigo-600 group-hover:shadow-md transition-all duration-300">
+                  {/* 3. SERVICE - Premium Department Badge */}
+                  <td className="px-6 py-5 bg-white border-y border-slate-200/60 group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[20%]">
+                    <div className="flex flex-col gap-2">
+                      {/* Minimalist Sub-header */}
+                      <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em] leading-none">
+                        Department
+                      </span>
+
+                      <div className="relative w-fit group/badge">
+                        {/* Subtle Glow Effect on Hover */}
+                        <div className="absolute inset-0 bg-indigo-400/20 blur-md rounded-lg opacity-0 group-hover/badge:opacity-100 transition-opacity duration-500" />
+                        
+                        <div className="relative flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg transition-all duration-300 group-hover/badge:border-indigo-300 group-hover/badge:-translate-y-0.5">
+                          {/* Department Icon Placeholder */}
+                          <div className="flex items-center justify-center w-5 h-5 rounded-md bg-slate-50 group-hover/badge:bg-indigo-50 transition-colors">
+                            <svg className="w-3 h-3 text-slate-400 group-hover/badge:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          </div>
+
+                          {/* The Service Text */}
+                          <span className="text-[10px] font-black text-slate-700 uppercase tracking-wide whitespace-nowrap group-hover/badge:text-indigo-700 transition-colors">
                             {item.service}
                           </span>
                         </div>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    {/* 4. SENTIMENT - High Fidelity Badge */}
-                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-40">
-                      <div className="flex flex-col gap-4">
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">BERT Insight</span>
+                  {/* 4. SENTIMENT - High-Fidelity AI Insight Badge */}
+                  <td className="px-6 py-5 bg-white border-y border-slate-200/60 group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[15%]">
+                    <div className="flex flex-col gap-2">
+                      {/* Minimalist Sub-header */}
+                      <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em] leading-none">
+                        BERT Insight
+                      </span>
+
+                      <div className="relative w-fit">
+                        {/* Dynamic Glow Layer - Changes color based on sentiment */}
+                        <div className={`absolute inset-0 blur-md opacity-20 transition-all duration-500 rounded-full
+                          ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-400' : 
+                            item.sentiment?.toLowerCase() === 'neutral' ? 'bg-amber-400' : 
+                            'bg-rose-400'}
+                        `} />
+
                         <div className={`
-                              relative inline-flex items-center gap-3 px-4 py-2 rounded-xl border transition-all duration-500 w-fit
-                              ${item.sentiment?.toLowerCase() === 'positive' 
-                                ? 'bg-emerald-50/50 border-emerald-200/50 text-emerald-700' 
-                                : item.sentiment?.toLowerCase() === 'neutral'
-                                  ? 'bg-amber-50/50 border-amber-200/50 text-amber-700'
-                                  : 'bg-rose-50/50 border-rose-200/50 text-rose-700'}
-                              group-hover:shadow-lg
-                            `}>
-                              <span className={`h-2 w-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(var(--color-pulse))]
-                                ${item.sentiment?.toLowerCase() === 'positive' 
-                                  ? 'bg-emerald-500' 
-                                  : item.sentiment?.toLowerCase() === 'neutral'
-                                    ? 'bg-amber-500'
-                                    : 'bg-rose-500'}
-                              `} />
-                          <span className="text-[9px] font-black uppercase tracking-widest">{item.sentiment}</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 5. AI GAUGE - Modern Linear Version */}
-                    <td className="align-top px-6 py-10 bg-slate-50/40 group-hover:bg-white border-y border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-40">
-                      <div className="flex flex-col gap-4">
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">AI Confidence</span>
-                        
-                        <div className="flex flex-col gap-2.5">
-                          {/* Score and Label */}
-                          <div className="flex items-end justify-between pr-2">
-                            <span className={`text-[12px] font-black leading-none tabular-nums
-                              ${parseFloat(item.confidence) >= 0.85 ? 'text-emerald-600' 
-                                : parseFloat(item.confidence) >= 0.60 ? 'text-amber-600' 
-                                : 'text-rose-600'}`}>
-                              {Math.round(parseFloat(item.confidence) * 100)}%
-                            </span>
-                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                              {parseFloat(item.confidence) >= 0.85 ? 'High' 
-                                : parseFloat(item.confidence) >= 0.60 ? 'Mid' 
-                                : 'Low'}
-                            </span>
+                          relative inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border shadow-sm transition-all duration-300
+                          ${item.sentiment?.toLowerCase() === 'positive' 
+                            ? 'bg-emerald-50/40 border-emerald-200/50 text-emerald-700 shadow-emerald-100/20' 
+                            : item.sentiment?.toLowerCase() === 'neutral' 
+                              ? 'bg-amber-50/40 border-amber-200/50 text-amber-700 shadow-amber-100/20' 
+                              : 'bg-rose-50/40 border-rose-200/50 text-rose-700 shadow-rose-100/20'}
+                          group-hover:translate-x-1
+                        `}>
+                          {/* Animated Status Dot */}
+                          <div className="relative flex items-center justify-center">
+                            <span className={`absolute h-2 w-2 rounded-full opacity-75 animate-ping
+                              ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-400' : 
+                                item.sentiment?.toLowerCase() === 'neutral' ? 'bg-amber-400' : 
+                                'bg-rose-400'}
+                            `} />
+                            <div className={`relative h-2 w-2 rounded-full shadow-inner
+                              ${item.sentiment?.toLowerCase() === 'positive' ? 'bg-emerald-500' : 
+                                item.sentiment?.toLowerCase() === 'neutral' ? 'bg-amber-500' : 
+                                'bg-rose-500'}
+                            `} />
                           </div>
 
-                          {/* Modern Segmented Progress Bar - Dynamic Fill Version */}
-                          <div className="flex gap-1.5 h-1.5 w-full max-w-27.5">
-                            {[0, 1, 2].map((i) => {
-                              const segmentSize = 1 / 3; 
-                              const segmentStart = i * segmentSize;
-                              const rawFill = (parseFloat(item.confidence) - segmentStart) / segmentSize;
-                              const fillWidth = Math.min(Math.max(rawFill * 100, 0), 100);
-
-                              return (
-                                <div 
-                                  key={i} 
-                                  className="h-full flex-1 bg-slate-100 rounded-full overflow-hidden relative"
-                                >
-                                  {/* Ang active "Fill" layer */}
-                                  <div 
-                                    className={`h-full transition-all duration-1000 ease-out rounded-full
-                                      ${parseFloat(item.confidence) >= 0.85 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' 
-                                        : parseFloat(item.confidence) >= 0.60 ? 'bg-amber-500' 
-                                        : 'bg-rose-500'}`}
-                                    style={{ 
-                                      width: `${fillWidth}%`,
-                                      transitionDelay: `${i * 150}ms` 
-                                    }}
-                                  />
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* Subtle Bottom Label */}
-                          <span className="text-[5px] font-bold text-slate-300 uppercase italic tracking-tighter">
-                            BERT Scoring Model
+                          <span className="text-[10px] font-black uppercase tracking-widest antialiased">
+                            {item.sentiment}
                           </span>
                         </div>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    {/* 6. TIMELINE - Elegant Micro-Clock */}
-                    <td className="align-top px-8 py-10 bg-slate-50/40 group-hover:bg-white rounded-r-[2.5rem] border-y border-r border-transparent group-hover:border-slate-200/60 transition-all duration-500 w-45">
-                      <div className="flex flex-col gap-4">
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">Timeline</span>
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-indigo-50 transition-colors">
-                              <svg className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <span className="text-[12px] font-black text-slate-800 tabular-nums whitespace-nowrap">
-                              {item.time}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 ml-1 mt-1">
-                            <div className="h-1 w-1 rounded-full bg-emerald-500" />
-                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest ">Received Live</span>
-                          </div>
+                  {/* 5. AI CONFIDENCE - Precision Gauge Styling */}
+                  <td className="px-6 py-5 bg-white border-y border-slate-200/60 group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[15%]">
+                    <div className="flex flex-col gap-2.5 w-28">
+                      {/* Label & Score Header */}
+                      <div className="flex justify-between items-end">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em] leading-none mb-1">
+                            Accuracy
+                          </span>
+                          <span className={`text-[13px] font-black tabular-nums tracking-tight transition-colors duration-500
+                            ${parseFloat(item.confidence) >= 0.90 ? 'text-emerald-600' : 
+                              parseFloat(item.confidence) >= 0.70 ? 'text-amber-600' : 
+                              'text-rose-600'}
+                          `}>
+                            {Math.round(parseFloat(item.confidence) * 100)}%
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest pb-0.5">
+                          BERT v2
+                        </span>
+                      </div>
+
+                      {/* Premium Progress Track */}
+                      <div className="relative h-1.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                        {/* Background "Glow" for the progress fill */}
+                        <div 
+                          className={`absolute inset-0 blur-[2px] opacity-40 transition-all duration-700
+                            ${parseFloat(item.confidence) >= 0.90 ? 'bg-emerald-400' : 
+                              parseFloat(item.confidence) >= 0.70 ? 'bg-amber-400' : 
+                              'bg-rose-400'}
+                          `}
+                          style={{ width: `${parseFloat(item.confidence) * 100}%` }}
+                        />
+                        
+                        {/* Primary Progress Fill */}
+                        <div 
+                          className={`relative h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(0,0,0,0.1)]
+                            ${parseFloat(item.confidence) >= 0.90 ? 'bg-linear-to-r from-emerald-400 to-emerald-600' : 
+                              parseFloat(item.confidence) >= 0.70 ? 'bg-linear-to-r from-amber-400 to-amber-600' : 
+                              'bg-linear-to-r from-rose-400 to-rose-600'}
+                          `}
+                          style={{ width: `${parseFloat(item.confidence) * 100}%` }}
+                        />
+                      </div>
+
+                      {/* Subtle status caption */}
+                      <span className={`text-[7px] font-black uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100
+                        ${parseFloat(item.confidence) >= 0.90 ? 'text-emerald-500' : 
+                          parseFloat(item.confidence) >= 0.70 ? 'text-amber-500' : 
+                          'text-rose-500'}
+                      `}>
+                        {parseFloat(item.confidence) >= 0.90 ? 'High Reliability' : 
+                        parseFloat(item.confidence) >= 0.70 ? 'Moderate Score' : 
+                        'Low Confidence'}
+                      </span>
+                    </div>
+                  </td>
+
+                 {/* 6. TIMESTAMP - Premium Chronological Finish */}
+                <td className="px-6 py-5 bg-white border-y border-r border-slate-200/60 rounded-r-2xl text-right group-hover:border-indigo-200 group-hover:bg-slate-50/30 transition-all duration-300 w-[15%]">
+                  <div className="flex flex-col items-end gap-2">
+                    {/* Label */}
+                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em] leading-none">
+                      Timeline
+                    </span>
+
+                    <div className="flex flex-col items-end">
+                      {/* Time Badge */}
+                      <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-indigo-100 group-hover:bg-white transition-all duration-300">
+                        <svg className="w-3 h-3 text-indigo-400 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-[10px] font-black text-slate-800 tabular-nums tracking-tight whitespace-nowrap">
+                          {new Date(item.date).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            hour12: true 
+                          })}
+                        </span>
+                      </div>
+                      
+                      {/* Date & Live Status */}
+                      <div className="flex items-center gap-2 mt-1.5 pr-1">
+                        <span className="text-[8px] font-bold text-slate-400 tabular-nums tracking-wide">
+                          {new Date(item.date).toLocaleDateString([], { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}
+                        </span>
+                        
+                        {/* Refined Live Status Indicator */}
+                        <div className="flex items-center justify-center relative w-2 h-2">
+                          <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
+                          <div className="relative w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                         </div>
                       </div>
-                    </td>
+                    </div>
+                  </div>
+                </td>
 
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </tr>
+              ))}
+            </tbody>
+          </table>
             ) : (
               (() => {
                 const theme = {

@@ -32,6 +32,8 @@ const FeedbackAnalysis = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const ITEMS_PER_LOAD = 4;
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -158,12 +160,70 @@ const FeedbackAnalysis = () => {
   }, [feedbackData]);
 
   if (loading) {
-  return (
-    <div className="flex items-center justify-center h-[60vh] text-slate-400 font-bold">
-      Loading feedback analytics…
-    </div>
-  );
-}
+    return (
+      <div className="min-h-screen bg-slate-50/50 p-8 space-y-10 animate-pulse">
+
+        {/* --- HEADER SKELETON --- */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-200 pb-8">
+          <div className="space-y-3">
+            <div className="h-10 w-64 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-48 bg-slate-200 rounded-lg" />
+          </div>
+          <div className="h-12 w-40 bg-slate-200 rounded-2xl" />
+        </div>
+
+        {/* --- TOP VISUALS SKELETON --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          {/* Service Performance Bar Chart Skeleton */}
+          <div className="lg:col-span-8 bg-slate-200 rounded-[3rem] h-112 relative" />
+
+          {/* Sentiment Pie & Timeline Skeleton */}
+          <div className="lg:col-span-4 flex flex-col gap-8">
+            <div className="flex-1 bg-slate-200 rounded-[3rem] h-56" />
+            <div className="flex-1 bg-slate-200 rounded-[3rem] h-56" />
+          </div>
+        </div>
+
+        {/* --- ACTION BAR SKELETON --- */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+          <div className="h-12 w-full md:w-80 bg-slate-200 rounded-xl" />
+          <div className="flex-1 md:w-auto flex gap-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-12 w-24 bg-slate-200 rounded-xl" />
+            ))}
+          </div>
+        </div>
+
+        {/* --- FEEDBACK TABLE SKELETON --- */}
+        <div className="overflow-y-auto max-h-[77vh]">
+          <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden">
+
+            {/* Table Header */}
+            <div className="flex px-10 py-6 gap-6 border-b border-slate-100">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-4 w-32 bg-slate-200 rounded" />
+              ))}
+            </div>
+
+            {/* Table Rows */}
+            <div className="divide-y divide-slate-100">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center px-10 py-6 gap-6">
+                  <div className="h-10 w-10 bg-slate-200 rounded-xl" />
+                  <div className="h-4 w-32 bg-slate-200 rounded" />
+                  <div className="h-4 w-24 bg-slate-200 rounded" />
+                  <div className="h-4 flex-1 bg-slate-200 rounded" />
+                  <div className="h-4 w-28 bg-slate-200 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
+  };
 
 if (error) {
   return (
@@ -200,6 +260,8 @@ if (error) {
     const sortedFeedback = [...filteredFeedback].sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
     });
+
+    const visibleFeedbacks = sortedFeedback.slice(0, visibleCount);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10 animate-in fade-in duration-700 overflow-x-hidden">
@@ -717,7 +779,18 @@ if (error) {
         </div>
 
         {/* Table Section */}
-        <div className="overflow-x-auto">
+        <div
+            className="overflow-y-auto overflow-x-hidden max-h-[77vh]"
+            onScroll={(e) => {
+              const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+              if (scrollTop + clientHeight >= scrollHeight - 50) {
+                setVisibleCount((prev) =>
+                  Math.min(prev + 10, sortedFeedback.length)
+                );
+              }
+            }}
+          >
           <table className="w-full text-left border-collapse table-fixed">
             <thead>
               <tr className="bg-white">
@@ -730,8 +803,8 @@ if (error) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {sortedFeedback.length > 0 ? (
-                sortedFeedback.map((item) => (
+              {visibleFeedbacks.length > 0 ? (
+                visibleFeedbacks.map((item) => (
                   <tr key={item.id} className="group hover:bg-blue-50/30 transition-all duration-300">
                     
                     {/* Citizen Details + Service Type Combined - Premium Modern Design */}
@@ -937,7 +1010,29 @@ if (error) {
               )}
             </tbody>
           </table>
-</div>
+          {visibleCount < sortedFeedback.length && (
+            <div className="py-12 flex flex-col items-center justify-center gap-4">
+              {/* Animated Pulse Ring */}
+              <div className="relative flex items-center justify-center w-10 h-10">
+                <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping" />
+                <div className="relative w-3 h-3 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]" />
+              </div>
+
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  Processing Activity
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="h-px w-8 bg-slate-200" />
+                  <span className="text-[10px] font-bold text-slate-500 italic">
+                    Fetching more insights...
+                  </span>
+                  <span className="h-px w-8 bg-slate-200" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

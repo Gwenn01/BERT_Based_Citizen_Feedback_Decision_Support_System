@@ -69,12 +69,104 @@ const AiInsights = () => {
     };
   }, [activeFilter, insightData]);
 
-  if (loading || !currentData)
+  if (loading || !currentData) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400 font-bold uppercase tracking-widest animate-pulse">
-        Initialising Intelligence Engine...
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10 animate-pulse">
+        {/* --- HEADER & FILTERS SKELETON --- */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-200 pb-8">
+          <div className="space-y-3">
+            <div className="h-9 w-64 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-80 bg-slate-100 rounded-md" />
+          </div>
+          <div className="h-10 w-48 bg-slate-200 rounded-xl" />
+        </div>
+
+        {/* --- TOP VISUALS SKELETON --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Neural Signal Analysis Card Skeleton (8 Columns) */}
+          <div className="lg:col-span-8 p-10 rounded-[3rem] border border-slate-200 bg-white space-y-8">
+            <div className="flex justify-between items-start">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-slate-100 rounded-xl" />
+                <div className="space-y-2">
+                  <div className="h-6 w-40 bg-slate-200 rounded" />
+                  <div className="h-3 w-56 bg-slate-100 rounded" />
+                </div>
+              </div>
+              <div className="h-8 w-24 bg-slate-100 rounded-2xl" />
+            </div>
+            <div className="space-y-4 pt-4">
+              <div className="h-10 w-3/4 bg-slate-200 rounded-lg" />
+              <div className="h-24 w-full bg-slate-50 rounded-3xl" />
+            </div>
+          </div>
+
+          {/* Service Integrity Index Card Skeleton (4 Columns) */}
+          <div className="lg:col-span-4 p-10 rounded-[3rem] bg-slate-900 flex flex-col justify-between">
+            <div className="flex gap-3">
+              <div className="w-12 h-12 bg-white/10 rounded-2xl" />
+              <div className="space-y-2">
+                <div className="h-3 w-16 bg-white/10 rounded" />
+                <div className="h-4 w-24 bg-white/20 rounded" />
+              </div>
+            </div>
+            <div className="py-6">
+              <div className="h-20 w-32 bg-white/20 rounded-xl mb-4" />
+              <div className="h-3 w-40 bg-white/10 rounded" />
+            </div>
+            <div className="space-y-4">
+              <div className="h-3 w-full bg-white/5 rounded-full" />
+              <div className="h-3 w-2/3 bg-white/5 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* --- STRATEGIC PLAYBOOK SKELETON --- */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden">
+          <div className="px-10 py-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 bg-slate-200 rounded-2xl" />
+              <div className="space-y-2">
+                <div className="h-7 w-48 bg-slate-200 rounded-lg" />
+                <div className="h-3 w-32 bg-slate-100 rounded" />
+              </div>
+            </div>
+            <div className="h-8 w-24 bg-slate-200 rounded-lg" />
+          </div>
+
+          {/* Repeated Playbook Item Skeletons */}
+          {[1, 2].map((i) => (
+            <div key={i} className="p-10 lg:p-14 grid grid-cols-1 lg:grid-cols-12 gap-12 border-b border-slate-50">
+              <div className="lg:col-span-5 space-y-6">
+                <div className="h-4 w-32 bg-slate-100 rounded" />
+                <div className="h-12 w-full bg-slate-200 rounded-xl" />
+                <div className="h-16 w-3/4 bg-slate-100 rounded-xl" />
+                <div className="flex gap-2">
+                  <div className="h-8 w-24 bg-slate-100 rounded-full" />
+                  <div className="h-8 w-24 bg-slate-100 rounded-full" />
+                </div>
+              </div>
+              <div className="lg:col-span-7 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-40 bg-slate-50 rounded-4xl" />
+                  <div className="h-40 bg-slate-900/5 rounded-" />
+                </div>
+                <div className="h-32 bg-slate-50 rounded-3xl" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* --- SYSTEM DIAGNOSTICS STATUS BAR SKELETON --- */}
+        <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-slate-100 mt-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-12 w-40 bg-slate-100 border border-slate-200 rounded-2xl" />
+          ))}
+          <div className="ml-auto h-6 w-32 bg-slate-50 rounded-full" />
+        </div>
       </div>
     );
+  }
 
   const filters = [
     { id: "daily", label: "Daily" },
