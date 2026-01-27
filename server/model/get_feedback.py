@@ -62,6 +62,15 @@ def fetch_feedback_by_service(service_id):
     conn.close()
     return feedback
 
+def fetch_negative_feedback_by_service(service_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT comment FROM feedback WHERE service_id = %s AND sentiment = 'negative'", (service_id,))
+    feedback = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return feedback
+
 
 def update_feedback_status(feedback_id, sentiment_label, confidence):
     conn = get_db_connection()

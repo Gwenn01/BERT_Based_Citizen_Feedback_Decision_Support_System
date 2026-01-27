@@ -3,6 +3,8 @@ from model.get_summary import get_latest_summary
 from model.get_feedback import fetch_recent_feedback, get_feedback
 from model.get_recommendations import get_recommendations
 from model.get_office_peroformance import get_all_office_performance
+from model.get_services import get_services
+from model.get_feedback import fetch_negative_feedback_by_service
 from controllers.mapper.admin_overview_mapper import format_dashboard_response, format_recent_feedback
 from controllers.mapper.genarate_service_performance_mapper import get_service_performance
 from controllers.mapper.admin_service_performance_mapper import admin_service_performance_mapper
@@ -58,6 +60,20 @@ def get_admin_service_performance():
     except Exception as e:
         return jsonify({
             "error": "Error in get_admin_service_performance",
+            "details": str(e)
+        }), 500
+        
+def get_negative_feedback_per_service():
+    try:
+        data = {}
+        services = get_services()
+        for service in services:
+            feedback = fetch_negative_feedback_by_service(service['service_id'])
+            data[service['service_name']] = feedback
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({
+            "error": "Error in get_feedback_per_service",
             "details": str(e)
         }), 500
         

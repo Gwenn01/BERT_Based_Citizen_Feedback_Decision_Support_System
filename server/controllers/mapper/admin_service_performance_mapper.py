@@ -22,7 +22,7 @@ def admin_service_performance_mapper(rows):
             "name": office_name,
             "rating": round(float(survey_analysis), 2),
             "volume": feedback_count,
-            "negative": round(100 - float(sentiment_analysis), 2),
+            "negative": sentiment_analysis,
             "cc_awareness": round(float(cc_awareness) / 100, 2)
         })
 
