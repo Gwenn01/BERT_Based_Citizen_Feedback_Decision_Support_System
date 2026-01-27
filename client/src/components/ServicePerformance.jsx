@@ -74,23 +74,32 @@ const ServicePerformance = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
+  const [negativeFeedback, setNegativeFeedback] = useState({});
 
   useEffect(() => {
-    const fetchServicePerformance = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/api/service-performance",
-        );
-        setServiceData(response.data);
+        setLoading(true);
+
+        // 2. Fire both requests at the same time
+        const [performanceRes, feedbackRes] = await Promise.all([
+          axios.get("http://127.0.0.1:5000/api/service-performance"),
+          axios.get("http://127.0.0.1:5000/api/get-negative-feedback")
+        ]);
+
+        // 3. Update states with the results
+        setServiceData(performanceRes.data);
+        setNegativeFeedback(feedbackRes.data);
+        
       } catch (err) {
-        console.error(err);
-        setError("Failed to load service performance data");
+        console.error("Error fetching data:", err);
+        setError("Failed to sync with LGU servers");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchServicePerformance();
+    fetchAllData();
   }, []);
 
   const highestRated = useMemo(() => {
@@ -768,6 +777,84 @@ const ServicePerformance = () => {
                             </div>
                           </div>
 
+                        </div>
+
+                        <div className="mt-12">
+                          {/* SECTION HEADER: Refined with tighter tracking and subtle gradients */}
+                          <div className="flex items-center justify-between mb-8 px-2">
+                            <div className="flex items-center gap-4">
+                              <div className="w-1.5 h-8 bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.4)]" />
+                              <div>
+                                <h5 className="text-sm font-black text-slate-800 uppercase tracking-[0.25em]">
+                                  Qualitative Friction Analysis
+                                </h5>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                  Raw Citizen Sentiments • {negativeFeedback[service.name]?.length || 0} Points Recorded
+                                </p>
+                              </div>
+                            </div>
+                            <div className="h-px flex-1 bg-linear-to-r from-slate-100 to-transparent ml-8 hidden md:block" />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {negativeFeedback[service.name] && negativeFeedback[service.name].length > 0 ? (
+                              negativeFeedback[service.name].map((item, cIdx) => (
+                                <div 
+                                  key={cIdx} 
+                                  className="group relative bg-white border border-slate-100 p-6 rounded-4xl transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:-translate-y-1 overflow-hidden"
+                                >
+                                  {/* PREMIUM DECOR: Subtle background numbering */}
+                                  <span className="absolute -bottom-4 -right-2 text-7xl font-black text-slate-50 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity pointer-events-none">
+                                    {cIdx + 1}
+                                  </span>
+
+                                  <div className="relative z-10">
+                                    <div className="flex items-center gap-3 mb-4">
+                                      <div className="flex gap-1">
+                                        <div className="w-1 h-1 rounded-full bg-rose-400" />
+                                        <div className="w-1 h-1 rounded-full bg-rose-200" />
+                                        <div className="w-1 h-1 rounded-full bg-rose-100" />
+                                      </div>
+                                      <span className="text-[9px] font-black text-rose-500/80 uppercase tracking-[0.2em] bg-rose-50/50 px-2.5 py-1 rounded-full">
+                                        High Friction Point
+                                      </span>
+                                    </div>
+
+                                    {/* QUOTE BLOCK: Clean and bold typography */}
+                                    <div className="relative">
+                                      <span className="absolute -left-2 -top-2 text-4xl text-slate-100 font-serif leading-none">“</span>
+                                      <p className="text-slate-700 text-[13px] leading-relaxed font-semibold pl-4 border-l border-slate-100 group-hover:border-rose-200 transition-colors italic">
+                                        {item.comment}
+                                      </p>
+                                    </div>
+
+                                    {/* FOOTER: Minimalist metadata */}
+                                    <div className="mt-6 pt-4 border-t border-slate-50 flex justify-between items-center">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-rose-400 transition-colors" />
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified Audit Entry</span>
+                                      </div>
+                                      <span className="text-[10px] font-black text-slate-300 uppercase italic">Source: Portal_v2</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))
+                            ) : (
+                              /* ENHANCED EMPTY STATE: For offices with perfect scores */
+                              <div className="col-span-full py-20 flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-[3.5rem] bg-linear-to-b from-white to-slate-50/50 shadow-inner">
+                                <div className="relative mb-6">
+                                  <div className="absolute inset-0 bg-emerald-400/20 blur-2xl rounded-full animate-pulse" />
+                                  <div className="relative w-16 h-16 bg-white border border-emerald-100 text-emerald-500 rounded-3xl flex items-center justify-center shadow-xl shadow-emerald-500/10">
+                                    <Activity size={28} />
+                                  </div>
+                                </div>
+                                <h6 className="text-slate-900 font-black text-xl tracking-tight">Optimal Service Flow</h6>
+                                <p className="text-slate-400 font-bold text-[11px] uppercase tracking-[0.3em] mt-2">
+                                  0 Negative Indicators Flagged for {service.name}
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       </Motion.div>
