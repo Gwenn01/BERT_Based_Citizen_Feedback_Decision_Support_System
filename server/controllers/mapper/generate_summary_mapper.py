@@ -72,9 +72,7 @@ def generate_period_summary(period_type, start_date, end_date):
             "cc3": f["cc3"]
         })
     result_awareness = analyze_citizens_charter(cc_data)
-    print(result_awareness)
     data["awareness"] = result_awareness
-    
     # 3. Build summary payload
     summary_data = {
         "period": {
@@ -86,6 +84,7 @@ def generate_period_summary(period_type, start_date, end_date):
         "sentiment": result_sentiment,
         "awareness": result_awareness
     }
+    print(summary_data)
     # 4. Save to DB
     period_id = insert_summary(summary_data)
     # insert recommendations 

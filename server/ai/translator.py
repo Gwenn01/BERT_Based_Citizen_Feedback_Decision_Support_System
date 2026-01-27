@@ -1,6 +1,6 @@
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
-translator = Translator()
+translator = GoogleTranslator()
 
 def translate_filipino_to_english(text: str) -> str:
     if not text or not text.strip():

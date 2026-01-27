@@ -33,7 +33,20 @@ def handle_survey_submission():
             start_date=today,
             end_date=today
         )
-
+        today = date.today()
+        start_date = today - timedelta(days=7)
+        generate_period_summary(
+            period_type="weekly",
+            start_date=start_date,
+            end_date=today
+        )
+        today = date.today()
+        start_date = today - timedelta(days=30)
+        generate_period_summary(
+            period_type="monthly",
+            start_date=start_date,
+            end_date=today
+        )
         return jsonify({
             "message": "Feedback submitted successfully",
             "feedback_id": feedback_id
