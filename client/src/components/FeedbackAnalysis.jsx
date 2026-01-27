@@ -160,12 +160,70 @@ const FeedbackAnalysis = () => {
   }, [feedbackData]);
 
   if (loading) {
-  return (
-    <div className="flex items-center justify-center h-[60vh] text-slate-400 font-bold">
-      Loading feedback analytics…
-    </div>
-  );
-}
+    return (
+      <div className="min-h-screen bg-slate-50/50 p-8 space-y-10 animate-pulse">
+
+        {/* --- HEADER SKELETON --- */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-200 pb-8">
+          <div className="space-y-3">
+            <div className="h-10 w-64 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-48 bg-slate-200 rounded-lg" />
+          </div>
+          <div className="h-12 w-40 bg-slate-200 rounded-2xl" />
+        </div>
+
+        {/* --- TOP VISUALS SKELETON --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          {/* Service Performance Bar Chart Skeleton */}
+          <div className="lg:col-span-8 bg-slate-200 rounded-[3rem] h-112 relative" />
+
+          {/* Sentiment Pie & Timeline Skeleton */}
+          <div className="lg:col-span-4 flex flex-col gap-8">
+            <div className="flex-1 bg-slate-200 rounded-[3rem] h-56" />
+            <div className="flex-1 bg-slate-200 rounded-[3rem] h-56" />
+          </div>
+        </div>
+
+        {/* --- ACTION BAR SKELETON --- */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+          <div className="h-12 w-full md:w-80 bg-slate-200 rounded-xl" />
+          <div className="flex-1 md:w-auto flex gap-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-12 w-24 bg-slate-200 rounded-xl" />
+            ))}
+          </div>
+        </div>
+
+        {/* --- FEEDBACK TABLE SKELETON --- */}
+        <div className="overflow-y-auto max-h-[77vh]">
+          <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden">
+
+            {/* Table Header */}
+            <div className="flex px-10 py-6 gap-6 border-b border-slate-100">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-4 w-32 bg-slate-200 rounded" />
+              ))}
+            </div>
+
+            {/* Table Rows */}
+            <div className="divide-y divide-slate-100">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center px-10 py-6 gap-6">
+                  <div className="h-10 w-10 bg-slate-200 rounded-xl" />
+                  <div className="h-4 w-32 bg-slate-200 rounded" />
+                  <div className="h-4 w-24 bg-slate-200 rounded" />
+                  <div className="h-4 flex-1 bg-slate-200 rounded" />
+                  <div className="h-4 w-28 bg-slate-200 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
+  };
 
 if (error) {
   return (
