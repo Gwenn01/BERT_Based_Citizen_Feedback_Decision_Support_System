@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Added this
 import { 
   Lock, Mail, Eye, EyeOff, ShieldCheck, 
-  Terminal, ChevronRight, Fingerprint
+  Terminal, ChevronRight, Fingerprint, XCircle, Loader2, CheckCircle2
 } from 'lucide-react';
 
 const AdminLogin = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(''); // Added missing error state
   const [systemStatus, setSystemStatus] = useState('OPERATIONAL');
+  const [modalStatus, setModalStatus] = useState('idle'); 
+  const [modalMessage, setModalMessage] = useState('');
   
   // Added missing formData state
   const [formData, setFormData] = useState({
@@ -36,41 +36,144 @@ const AdminLogin = () => {
     });
   };
 
+  const closeModal = () => {
+    setModalStatus('idle');
+    setModalMessage('');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setModalStatus('loading');
+    setModalMessage('Establishing secure connection...');
 
     try {
       const response = await fetch('http://127.0.0.1:5000/api/login', { 
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
 
       if (result.success) {
+        setModalStatus('success');
+        setModalMessage('Access Granted. Redirecting to Core Dashboard...');
         localStorage.setItem('adminUser', JSON.stringify(result.data));
-        navigate('/dashboard'); 
+        
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
       } else {
-        setError(result.message || 'Invalid credentials');
+        setModalStatus('error');
+        setModalMessage(result.message || 'Authorization Denied: Invalid Security Key');
       }
-
     } catch {
-      setError('Cannot connect to server. Please check your backend.');
-    } finally {
-      setLoading(false);
+      setModalStatus('error');
+      setModalMessage('Network Protocol Error: Cannot reach Iba-Secure-Node');
     }
   };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/50 font-sans p-4 lg:p-0">
+
+      {modalStatus !== 'idle' && (
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        {/* Ultra-pure Backdrop */}
+        <div 
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-all duration-500" 
+          onClick={modalStatus === 'error' ? closeModal : undefined} 
+        />
+        
+        {/* Main Modal Container */}
+        <div className={`relative w-full max-w-sm overflow-hidden rounded-[40px] bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] border border-slate-100 transition-all duration-500
+          ${modalStatus === 'error' ? 'animate-shake' : 'animate-in zoom-in-95 fade-in duration-300'}
+        `}>
+          
+          {/* Dynamic Status Bar with Gradient */}
+          <div className={`h-1.5 w-full transition-all duration-1000 ${
+            modalStatus === 'loading' ? 'bg-linear-to-r from-blue-400 via-blue-600 to-blue-400 bg-size-[200%_auto] animate-gradient' : 
+            modalStatus === 'success' ? 'bg-emerald-500' : 'bg-red-500'
+          }`} />
+          
+          <div className="p-10 pt-12">
+            <div className="flex flex-col items-center text-center">
+              
+              {/* MODERN ICON ANIMATION SECTION */}
+              <div className="relative mb-8 flex justify-center items-center">
+                {/* Background Glows */}
+                {modalStatus === 'success' && (
+                  <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
+                )}
+                
+                <div className={`relative z-10 w-24 h-24 flex items-center justify-center rounded-4xl transition-all duration-700 shadow-sm ${
+                  modalStatus === 'loading' ? 'bg-blue-50 text-blue-600 shadow-blue-100' : 
+                  modalStatus === 'success' ? 'bg-emerald-50 text-emerald-600 scale-110 rotate-360 shadow-emerald-100' : 
+                  'bg-red-50 text-red-600 shadow-red-100'
+                }`}>
+                  
+                  {modalStatus === 'loading' && (
+                    <div className="relative flex items-center justify-center">
+                      <Loader2 size={44} className="animate-spin" />
+                      <div className="absolute inset-0 border-4 border-blue-200/30 rounded-full" />
+                    </div>
+                  )}
+
+                  {modalStatus === 'success' && (
+                    <div className="animate-check-pop">
+                      <CheckCircle2 size={48} strokeWidth={2.5} />
+                    </div>
+                  )}
+
+                  {modalStatus === 'error' && (
+                    <div className="animate-error-wiggle">
+                      <XCircle size={48} strokeWidth={2.5} />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* TEXT SECTION */}
+              <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">
+                {modalStatus === 'loading' && 'Authenticating'}
+                {modalStatus === 'success' && 'Welcome Back'}
+                {modalStatus === 'error' && 'Access Denied'}
+              </h3>
+              
+              <p className="text-sm font-medium text-slate-500 leading-relaxed mb-10 px-4">
+                {modalMessage}
+              </p>
+
+              {/* ACTION SECTION */}
+              <div className="w-full">
+                {modalStatus === 'error' && (
+                  <button 
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); closeModal(); }}
+                    className="group relative w-full py-4 bg-slate-900 text-white text-[11px] font-bold rounded-2xl transition-all hover:bg-black active:scale-95 shadow-xl shadow-slate-200"
+                  >
+                    <span className="relative z-10 tracking-[0.3em]">TRY AGAIN</span>
+                  </button>
+                )}
+
+                {modalStatus === 'loading' && (
+                  <div className="flex justify-center items-center gap-1.5 py-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce"></span>
+                  </div>
+                )}
+
+                {modalStatus === 'success' && (
+                  <div className="flex items-center justify-center gap-2 text-emerald-600 font-bold text-[10px] tracking-[0.2em] animate-pulse">
+                    INITIALIZING CORE...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
       
       {/* Background Decorative Blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -78,20 +181,42 @@ const AdminLogin = () => {
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-slate-300/30 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-[32px] overflow-hidden bg-white border border-white/40 backdrop-blur-sm">
+      <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-4xl overflow-hidden bg-white border border-white/40 backdrop-blur-sm">
         
         {/* LEFT PANEL */}
-        <div className="lg:w-[38%] p-10 lg:p-12 bg-[#0F172A] relative overflow-hidden flex flex-col justify-between min-h-[400px]">
-          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] bg-[size:20px_20px]" />
+        <div className="lg:w-[38%] p-10 lg:p-12 bg-[#0F172A] relative overflow-hidden flex flex-col justify-between min-h-100">
+          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[20px_20px]" />
           
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-16">
-              <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
-                <Terminal size={22} className="text-white" />
+            <div className="flex items-center gap-4 mb-16">
+              {/* Logo Container */}
+              <div className="relative group">
+                {/* Decorative glow behind the logo */}
+                <div className="absolute inset-0 bg-blue-500/20 blur-lg rounded-full group-hover:bg-blue-500/30 transition-all duration-500" />
+                
+                <div className="relative bg-white/10 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-2xl">
+                  <img 
+                    src="/lgu-iba-logo.jpg" 
+                    alt="LGU Iba Logo"
+                    className="w-12 h-12 object-contain filter drop-shadow-md rounded-full transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/150?text=IBA"; // Fallback if image fails
+                    }}
+                  />
+                </div>
               </div>
+
+              {/* Brand Text */}
               <div>
-                <h1 className="text-lg font-bold text-white tracking-tight leading-none">LGU Iba</h1>
-                <p className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase mt-1">Core Admin</p>
+                <h1 className="text-xl font-black text-white tracking-tight leading-none">
+                  LGU <span className="text-blue-500">Iba</span>
+                </h1>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="h-px w-3 bg-blue-500/50"></span>
+                  <p className="text-[10px] text-blue-400 font-bold tracking-[0.25em] uppercase">
+                    Core Admin
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -100,7 +225,7 @@ const AdminLogin = () => {
                 Municipal <br /> 
                 <span className="text-blue-500">Intelligence</span> Dashboard
               </h2>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-[280px]">
+              <p className="text-slate-400 text-sm leading-relaxed max-w-70">
                 Secure gateway for sentiment analysis and real-time governance metrics.
               </p>
             </div>
@@ -131,14 +256,6 @@ const AdminLogin = () => {
               <h3 className="text-2xl font-bold text-slate-900 mb-2">Authorize Access</h3>
               <p className="text-slate-500 text-sm font-medium">Please enter your credentials to continue.</p>
             </div>
-
-            {/* ERROR ALERT BOX */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-xs rounded-2xl flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                {error}
-              </div>
-            )}
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-1.5">
@@ -186,17 +303,10 @@ const AdminLogin = () => {
 
               <button 
                 type="submit" 
-                disabled={loading}
                 className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-lg shadow-blue-500/20 active:scale-[0.98]"
               >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
                     ENTER DASHBOARD
                     <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
               </button>
             </form>
 
