@@ -9,6 +9,7 @@ googletrans==4.0.0-rc1
 apscheduler
 mysql-connector-python
 GoogleTranslator
+bcrypt
 
 
 

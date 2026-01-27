@@ -20,7 +20,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 from routes.health_routes import health_bp
 # TEST CONNECTION
 from routes.test_db_routes import test_db_bp
-
+# login
+from routes.auth_routes import auth_bp
 # ARTIFICIAL INTELLIGENCE
 # SURVEY
 from routes.get_survey_routes import survey_bp
@@ -30,6 +31,7 @@ from routes.admin_service_performance_routes import admin_performance_bp
 #RECOMMENDATIONS
 from routes.admin_recommendations_routes import admin_recommendation_bp
 #SENTIMENT ANALYSIS
+app.register_blueprint(auth_bp, url_prefix="/api")
 app.register_blueprint(health_bp,  url_prefix="/api")
 app.register_blueprint(test_db_bp, url_prefix="/api")
 app.register_blueprint(survey_bp, url_prefix="/api")

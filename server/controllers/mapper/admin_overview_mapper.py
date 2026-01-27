@@ -116,7 +116,7 @@ def format_recent_feedback(rows):
             "sentiment": row.get("sentiment"),
             "confidence": row.get("confidence"),
             "text": row.get("comment", ""),
-            "time": format_time(row.get("created_at")),
+            "date": row.get("created_at"),
         })
 
     return {
