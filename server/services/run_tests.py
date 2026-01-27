@@ -1,5 +1,5 @@
 from ai.bert_model import predict_sentiment
-from ai.translator import translate_filipino_to_english
+#from ai.translator import translate_filipino_to_english
 
 from services.summary_result.survey_agent import analyze_survey
 from services.summary_result.sentiment_agent import analyze_sentiment

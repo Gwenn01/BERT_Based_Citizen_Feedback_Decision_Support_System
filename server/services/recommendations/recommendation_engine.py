@@ -22,7 +22,7 @@ def generate_recommendations(issues):
 
     dimensions_kb = kb.get("dimensions", {})
     cross_kb = kb.get("cross_cutting_issues", {})
-
+    
     recommendations = []
 
     for issue in issues:

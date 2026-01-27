@@ -112,7 +112,7 @@
   },
 
   "cross_cutting_issues": {
-    "overall_service_experience": {
+    "negative_service_experience": {
       "category": "Public Satisfaction",
       "issue": "High overall public dissatisfaction with government services",
       "root_cause": "Multiple service weaknesses across different service quality dimensions",
@@ -124,7 +124,18 @@
         "Monitor service performance regularly and apply corrective actions"
       ]
     },
-
+    "neutral_service_experience": {
+      "category": "Public Satisfaction",
+      "issue": "Moderate public satisfaction with government services",
+      "root_cause": "Inconsistent service quality across different service delivery points",
+      "impact": "Stable but cautious public perception of government performance",
+      "solutions": [
+        "Review neutral feedback to identify areas for incremental improvement",
+        "Standardize service procedures across offices",
+        "Provide refresher training to reinforce service quality standards",
+        "Track service performance trends to prevent decline in satisfaction"
+      ]
+    },
     "citizen_charter_awareness": {
       "category": "Information Dissemination",
       "issue": "Low public awareness of the Citizen’s Charter",

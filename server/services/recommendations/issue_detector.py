@@ -21,12 +21,21 @@ def detect_issues(data):
     if sentiment["percentages"]["negative"] > HIGH_NEGATIVE_SENTIMENT:
         issues.append({
             "category": "Public Satisfaction",
-            "dimension": "Overall Service Experience",
+            "dimension": "Negative Service Experience",
             "value": sentiment["percentages"]["negative"],
             "severity": "Critical"
         })
+    
+    # 3. Neutral sentiment issue
+    if sentiment["percentages"]["neutral"] > HIGH_NEUTRAL_SENTIMENT:
+        issues.append({
+            "category": "Public Satisfaction",
+            "dimension": "Neutral Service Experience",
+            "value": sentiment["percentages"]["neutral"],
+            "severity": "Medium"
+        })
 
-    # 3. Citizen Charter awareness
+    # 4. Citizen Charter awareness
     if awareness["overall_awareness"] < LOW_AWARENESS_THRESHOLD:
         issues.append({
             "category": "Information Dissemination",

@@ -8,7 +8,7 @@ from model.get_feedback import (
 from services.summary_result.survey_agent import analyze_survey
 from services.summary_result.sentiment_agent import analyze_sentiment
 from services.summary_result.citizen_charter_awareness import analyze_citizens_charter
-from ai.translator import translate_filipino_to_english
+#from ai.translator import translate_filipino_to_english
 from services.recommendations.recommendation_service import generate_decision_support
 from model.insert_recommendation import insert_recommendation
 import json
