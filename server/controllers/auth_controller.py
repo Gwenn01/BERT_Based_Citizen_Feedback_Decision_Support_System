@@ -63,6 +63,6 @@ def insert_admin_controller():
     ...
     insert_admin(
     fullname="Admin User",
-    email=" h",
+    email="admin@gov.ph",
     password="admin123"
     )
