@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Added this
 import { 
   Lock, Mail, Eye, EyeOff, ShieldCheck, 
-  Terminal, ChevronRight, Fingerprint, XCircle, Loader2, CheckCircle2
+  Loader2, Check, ArrowRight, ShieldAlert
 } from 'lucide-react';
 
 const AdminLogin = () => {
@@ -81,69 +81,71 @@ const AdminLogin = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-100/50 font-sans p-4 lg:p-0">
 
       {modalStatus !== 'idle' && (
-      <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-        {/* Ultra-pure Backdrop */}
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+
         <div 
-          className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-all duration-500" 
+          className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl transition-opacity duration-700 animate-in fade-in" 
           onClick={modalStatus === 'error' ? closeModal : undefined} 
         />
         
-        {/* Main Modal Container */}
-        <div className={`relative w-full max-w-sm overflow-hidden rounded-[40px] bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] border border-slate-100 transition-all duration-500
-          ${modalStatus === 'error' ? 'animate-shake' : 'animate-in zoom-in-95 fade-in duration-300'}
+        <div className={`relative w-full max-w-sm overflow-hidden rounded-[48px] bg-white/90 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] border border-white transition-all duration-500
+          ${modalStatus === 'error' ? 'animate-shake' : 'animate-in zoom-in-95 slide-in-from-bottom-10 duration-500'}
         `}>
           
-          {/* Dynamic Status Bar with Gradient */}
-          <div className={`h-1.5 w-full transition-all duration-1000 ${
-            modalStatus === 'loading' ? 'bg-linear-to-r from-blue-400 via-blue-600 to-blue-400 bg-size-[200%_auto] animate-gradient' : 
+          <div className={`h-2 w-full transition-all duration-700 relative overflow-hidden ${
+            modalStatus === 'loading' ? 'bg-slate-100' : 
             modalStatus === 'success' ? 'bg-emerald-500' : 'bg-red-500'
-          }`} />
+          }`}>
+            {modalStatus === 'loading' && (
+              <div className="absolute inset-0 bg-linear-to-r from-blue-400 via-indigo-600 to-blue-400 bg-size[200%_100%] animate-shimmer" />
+            )}
+          </div>
           
-          <div className="p-10 pt-12">
+          <div className="p-12">
             <div className="flex flex-col items-center text-center">
               
-              {/* MODERN ICON ANIMATION SECTION */}
-              <div className="relative mb-8 flex justify-center items-center">
-                {/* Background Glows */}
-                {modalStatus === 'success' && (
-                  <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
-                )}
+
+              <div className="relative mb-10">
+                <div className={`absolute inset-0 rounded-full blur-2xl transition-opacity duration-500 opacity-40 ${
+                  modalStatus === 'loading' ? 'bg-blue-400' : 
+                  modalStatus === 'success' ? 'bg-emerald-400' : 'bg-red-400'
+                }`} />
                 
-                <div className={`relative z-10 w-24 h-24 flex items-center justify-center rounded-4xl transition-all duration-700 shadow-sm ${
-                  modalStatus === 'loading' ? 'bg-blue-50 text-blue-600 shadow-blue-100' : 
-                  modalStatus === 'success' ? 'bg-emerald-50 text-emerald-600 scale-110 rotate-360 shadow-emerald-100' : 
-                  'bg-red-50 text-red-600 shadow-red-100'
+                <div className={`relative z-10 w-28 h-28 flex items-center justify-center rounded-[35%] transition-all duration-700 border-2 shadow-2xl ${
+                  modalStatus === 'loading' ? 'bg-white border-blue-100 text-blue-600' : 
+                  modalStatus === 'success' ? 'bg-white border-emerald-100 text-emerald-600 scale-110' : 
+                  'bg-white border-red-100 text-red-600'
                 }`}>
                   
                   {modalStatus === 'loading' && (
                     <div className="relative flex items-center justify-center">
-                      <Loader2 size={44} className="animate-spin" />
-                      <div className="absolute inset-0 border-4 border-blue-200/30 rounded-full" />
+                      <Loader2 size={48} strokeWidth={1.5} className="animate-spin" />
+                      <div className="absolute inset-0 border-b-2 border-blue-600 rounded-full animate-[spin_0.8s_linear_infinite]" />
                     </div>
                   )}
 
                   {modalStatus === 'success' && (
-                    <div className="animate-check-pop">
-                      <CheckCircle2 size={48} strokeWidth={2.5} />
+                    <div className="animate-in zoom-in-50 duration-500">
+                      <ShieldCheck size={52} strokeWidth={1.5} />
                     </div>
                   )}
 
                   {modalStatus === 'error' && (
-                    <div className="animate-error-wiggle">
-                      <XCircle size={48} strokeWidth={2.5} />
+                    <div className="animate-in shake-x duration-500">
+                      <ShieldAlert size={52} strokeWidth={1.5} />
                     </div>
                   )}
                 </div>
               </div>
               
-              {/* TEXT SECTION */}
-              <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">
-                {modalStatus === 'loading' && 'Authenticating'}
-                {modalStatus === 'success' && 'Welcome Back'}
-                {modalStatus === 'error' && 'Access Denied'}
+              {/* TEXT SECTION: Using variable weights for premium feel */}
+              <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                {modalStatus === 'loading' && <span className="flex gap-1">Validating<span className="animate-pulse">...</span></span>}
+                {modalStatus === 'success' && <>Access <span className="font-light italic text-slate-400">Granted</span></>}
+                {modalStatus === 'error' && <>Access <span className="font-light italic text-slate-400">Denied</span></>}
               </h3>
               
-              <p className="text-sm font-medium text-slate-500 leading-relaxed mb-10 px-4">
+              <p className="text-[13px] font-medium text-slate-500 leading-relaxed mb-12 px-2 opacity-80 uppercase tracking-wider">
                 {modalMessage}
               </p>
 
@@ -153,23 +155,34 @@ const AdminLogin = () => {
                   <button 
                     type="button"
                     onClick={(e) => { e.stopPropagation(); closeModal(); }}
-                    className="group relative w-full py-4 bg-slate-900 text-white text-[11px] font-bold rounded-2xl transition-all hover:bg-black active:scale-95 shadow-xl shadow-slate-200"
+                    className="w-full py-4.5 bg-slate-950 text-white text-[11px] font-black rounded-[20px] transition-all hover:bg-red-600 active:scale-95 shadow-2xl shadow-slate-900/20 tracking-[0.3em]"
                   >
-                    <span className="relative z-10 tracking-[0.3em]">TRY AGAIN</span>
+                    RE-AUTHORIZE
                   </button>
                 )}
 
                 {modalStatus === 'loading' && (
-                  <div className="flex justify-center items-center gap-1.5 py-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce"></span>
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="px-4 py-2 rounded-full bg-blue-50 border border-blue-100">
+                      <span className="text-[10px] font-black text-blue-600 tracking-widest uppercase animate-pulse">
+                        Scanning Identity
+                      </span>
+                    </div>
                   </div>
                 )}
 
                 {modalStatus === 'success' && (
-                  <div className="flex items-center justify-center gap-2 text-emerald-600 font-bold text-[10px] tracking-[0.2em] animate-pulse">
-                    INITIALIZING CORE...
+                  <div className="space-y-4 w-full">
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 w-full origin-left animate-[loading-bar_2s_ease-in-out]" />
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-emerald-600 font-black text-[10px] tracking-[0.25em]">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      ENTRY AUTHORIZED
+                    </div>
                   </div>
                 )}
               </div>
@@ -179,153 +192,164 @@ const AdminLogin = () => {
       </div>
     )}
       
-      {/* Background Decorative Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-slate-300/30 rounded-full blur-[120px]" />
+      {/* MODERN PREMIUM BACKGROUND ENGINE */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none bg-[#f8fafc]">
+        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        <div className="absolute -top-[15%] -right-[5%] w-[60%] h-[60%] rounded-full 
+          bg-linear-to-br from-blue-400/20 to-indigo-500/10 blur-[140px] animate-pulse duration-[10s]" />
+        <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full 
+          bg-linear-to-tr from-slate-300/30 to-blue-200/10 blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px 
+          bg-linear-to-r from-transparent via-blue-500/10 to-transparent rotate-35 scale-150" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[64px_64px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-4xl overflow-hidden bg-white border border-white/40 backdrop-blur-sm">
-        
-        {/* LEFT PANEL */}
-        <div className="lg:w-[38%] p-10 lg:p-12 bg-[#0F172A] relative overflow-hidden flex flex-col justify-between min-h-100">
-          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[20px_20px]" />
+      <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row shadow-[0_48px_100px_-20px_rgba(0,0,0,0.2)] rounded-[2.5rem] overflow-hidden bg-white/90 backdrop-blur-2xl border border-white/20">
+  
+        {/* LEFT PANEL: The "Command Center" */}
+        <div className="lg:w-[40%] p-10 lg:p-14 bg-[#020617] relative overflow-hidden flex flex-col justify-between min-h-150">
+          {/* Animated Mesh Gradient Background */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-indigo-600/20 rounded-full blur-[100px]" />
+            <div className="absolute inset-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
+          </div>
           
           <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-16">
-              {/* Logo Container */}
-              <div className="relative group">
-                {/* Decorative glow behind the logo */}
-                <div className="absolute inset-0 bg-blue-500/20 blur-lg rounded-full group-hover:bg-blue-500/30 transition-all duration-500" />
-                
-                <div className="relative bg-white/10 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-2xl">
-                  <img 
-                    src="/lgu-iba-logo.jpg" 
-                    alt="LGU Iba Logo"
-                    className="w-12 h-12 object-contain filter drop-shadow-md rounded-full transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/150?text=IBA"; // Fallback if image fails
-                    }}
-                  />
+            <div className="flex items-center gap-5 mb-20">
+              <div className="relative">
+                {/* Multi-layered Logo Ring */}
+                <div className="absolute inset-0 bg-linear-to-tr from-blue-600 to-cyan-400 blur-md opacity-40 animate-spin-slow" />
+                <div className="relative p-0.5 rounded-2xl bg-linear-to-b from-white/20 to-transparent border border-white/10 backdrop-blur-md">
+                  <div className="bg-[#020617] rounded-[14px] p-2">
+                    <img 
+                      src="/lgu-iba-logo.jpg" 
+                      alt="LGU Iba"
+                      className="w-12 h-12 object-contain rounded-full"
+                      onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=IBA"; }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Brand Text */}
               <div>
-                <h1 className="text-xl font-black text-white tracking-tight leading-none">
-                  LGU <span className="text-blue-500">Iba</span>
+                <h1 className="text-2xl font-bold text-white tracking-tight italic">
+                  LGU <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-cyan-300">IBA</span>
                 </h1>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="h-px w-3 bg-blue-500/50"></span>
-                  <p className="text-[10px] text-blue-400 font-bold tracking-[0.25em] uppercase">
-                    Core Admin
-                  </p>
-                </div>
+                <p className="text-[10px] text-blue-400/80 font-black tracking-[0.3em] uppercase">
+                  Systems Administration
+                </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-3xl font-semibold text-white leading-[1.2] tracking-tight">
+            <div className="space-y-6">
+              <h2 className="text-4xl font-medium text-white leading-[1.1] tracking-tight">
                 Municipal <br /> 
-                <span className="text-blue-500">Intelligence</span> Dashboard
+                <span className="font-light italic text-slate-400">Intelligence</span>
               </h2>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-70">
-                Secure gateway for sentiment analysis and real-time governance metrics.
+              <div className="h-1 w-12 bg-linear-to-r from-blue-500 to-transparent rounded-full" />
+              <p className="text-slate-400 text-sm leading-relaxed max-w-70 font-light">
+                Accessing the centralized governance engine for real-time sentiment and analytics.
               </p>
             </div>
           </div>
 
-          <div className="relative z-10 space-y-6">
-             <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
-                <div className="flex items-center justify-between mb-3 text-[10px] font-bold">
-                    <span className="text-slate-500 uppercase tracking-widest">System Status</span>
-                    <span className="text-emerald-400 font-mono">{systemStatus}</span>
+          {/* System Status Bento Card */}
+          <div className="relative z-10">
+            <div className="p-6 rounded-3xl bg-white/3 border border-white/10 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Protocol Active</span>
                 </div>
-                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-blue-500 h-full w-[65%] animate-pulse" />
+                <span className="text-[10px] font-mono text-blue-400">{systemStatus}</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-[9px] text-slate-500 uppercase font-bold">
+                  <span>Neural Link</span>
+                  <span>98.2%</span>
                 </div>
-             </div>
-             
-             <div className="flex items-center gap-3 text-slate-500 ml-1">
-                <Fingerprint size={14} />
-                <span className="text-[10px] font-medium tracking-widest uppercase opacity-60">Session: Encrypted</span>
-             </div>
+                <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                  <div className="bg-linear-to-r from-blue-600 to-cyan-400 h-full w-[98%] transition-all duration-1000" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="lg:w-[62%] p-8 lg:p-16 bg-white/80 backdrop-blur-md flex flex-col justify-center">
-          <div className="max-w-md mx-auto w-full">
-            <div className="mb-10">
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Authorize Access</h3>
-              <p className="text-slate-500 text-sm font-medium">Please enter your credentials to continue.</p>
+        {/* RIGHT PANEL: The Formal Portal */}
+        <div className="lg:w-[60%] p-8 lg:p-20 bg-slate-50/50 backdrop-blur-xl flex flex-col justify-center relative">
+          <div className="max-w-md mx-auto w-full relative z-10">
+            <div className="mb-12">
+              <h3 className="text-3xl font-semibold text-slate-900 tracking-tight">Welcome Back</h3>
+              <p className="text-slate-500 mt-2 text-sm font-light">Authenticated access required for Core Admin.</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Official Email Address</label>
-                <div className="relative group">
-                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Administrator Email</label>
+                <div className="group relative">
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                   <input 
                     name="email"
                     type="email" 
-                    value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                    placeholder="name@iba.gov.ph"
+                    className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-slate-900 shadow-sm transition-all focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none placeholder:text-slate-300"
+                    placeholder="Enter your official gov email"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Security Key</label>
-                <div className="relative group">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Security Key</label>
+                <div className="group relative">
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                   <input 
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl pl-12 pr-12 py-4 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                    placeholder="••••••••••••"
+                    className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-12 py-4 text-slate-900 shadow-sm transition-all focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none placeholder:text-slate-300"
+                    placeholder="Enter authorization key"
                     required
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pb-2">
+              <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer group">
-                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer" />
-                  <span className="text-xs text-slate-500 font-medium group-hover:text-slate-700 transition-colors">Persistent Session</span>
+                  <div className="relative flex items-center">
+                    <input type="checkbox" className="peer h-4 w-4 opacity-0 absolute cursor-pointer" />
+                    <div className="h-4 w-4 bg-white border border-slate-300 rounded peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all" />
+                    <Check size={12} className="absolute text-white scale-0 peer-checked:scale-100 transition-transform left-0.5" />
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium group-hover:text-slate-800 transition-colors">Trust this device</span>
                 </label>
-                <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700">Forgot Key?</button>
+                <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline">Reset Credentials</button>
               </div>
 
               <button 
                 type="submit" 
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-lg shadow-blue-500/20 active:scale-[0.98]"
+                className="w-full py-4 bg-[#0F172A] hover:bg-blue-600 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 group shadow-xl shadow-slate-200 hover:shadow-blue-500/30 active:scale-[0.98]"
               >
-                    ENTER DASHBOARD
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                Authorize Access
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
 
-            <div className="mt-10 flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <ShieldCheck className="text-blue-600 shrink-0 mt-0.5" size={16} />
+            <div className="mt-12 flex items-center gap-4 p-4 rounded-2xl bg-blue-50/50 border border-blue-100/50">
+              <div className="p-2 bg-white rounded-xl shadow-sm">
+                <ShieldCheck className="text-blue-600" size={20} />
+              </div>
               <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-                Protected by Senti-Iba Firewall. All access requests are logged and monitored by the IT Governance Division.
+                <span className="text-blue-700 font-bold">End-to-End Encryption Active.</span> All administrative actions are recorded under the Municipal Security Act of 2024.
               </p>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="fixed bottom-6 w-full text-center text-[10px] text-slate-400 font-bold tracking-[0.4em] uppercase opacity-50">
-        IBA-SECURE-NODE // 2026.4
       </div>
     </div>
   );

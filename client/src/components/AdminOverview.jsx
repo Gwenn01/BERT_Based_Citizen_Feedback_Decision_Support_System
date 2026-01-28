@@ -771,7 +771,7 @@ const AdminOverview = () => {
                     <div className="flex items-center gap-4">
                       {/* Avatar Container with Depth */}
                       <div className="relative shrink-0">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center relative overflow-hidden group-hover:shadow-xl group-hover:shadow-indigo-500/20 transition-all duration-500">
+                        <div className="h-12 w-12 rounded-2xl bg-slate-400/30 flex items-center justify-center relative overflow-hidden group-hover:shadow-xl group-hover:shadow-indigo-500/20 transition-all duration-500">
                           {/* Subtle Background Pattern/Gradient */}
                           <div className="absolute inset-0 bg-linear-to-br from-indigo-600 via-blue-600 to-violet-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           
