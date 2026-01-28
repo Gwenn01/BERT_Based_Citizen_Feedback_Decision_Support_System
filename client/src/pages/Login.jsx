@@ -19,6 +19,10 @@ const AdminLogin = () => {
   });
 
   useEffect(() => {
+    document.title = "Admin Login | LGU Iba";
+  }, []);
+
+  useEffect(() => {
     const statuses = ['SYSTEM SCAN', 'ENCRYPTING', 'OPERATIONAL'];
     let i = 0;
     const interval = setInterval(() => {

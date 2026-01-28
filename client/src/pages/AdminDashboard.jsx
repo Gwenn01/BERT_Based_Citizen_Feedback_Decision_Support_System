@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import AdminOverview from '../components/AdminOverview';
 import FeedbackAnalysis from '../components/FeedbackAnalysis';
 import ServicePerformance from '../components/ServicePerformance';
 import AIInsights from '../components/AiInsights';
-import Reports from '../components/Reports';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('overview'); 
+
+  useEffect(() => {
+      const titles = {
+        overview: 'Admin Dashboard – Overview',
+        analysis: 'Admin Dashboard – Feedback Analysis',
+        service: 'Admin Dashboard – Service Performance',
+        ai: 'Admin Dashboard – AI Insights',
+        reports: 'Admin Dashboard – Reports',
+      };
+
+      document.title = titles[activeTab] || 'Admin Dashboard';
+    }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -15,7 +26,6 @@ const AdminDashboard = () => {
       case 'analysis': return <FeedbackAnalysis />;
       case 'service': return <ServicePerformance />;
       case 'ai': return <AIInsights />;
-      case 'reports': return <Reports />;
       default: return <AdminOverview />;
     }
   };
