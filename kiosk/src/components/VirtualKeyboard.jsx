@@ -16,7 +16,7 @@ const VirtualKeyboard = ({ onChange, onKeyPress, inputValue = "", onClose }) => 
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 shadow-2xl z-50">
       {/* Header with close button */}
       <div className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-300">
-        <span className="font-semibold text-gray-700">Virtual Keyboard</span>
+        <span className="font-semibold text-gray-700"></span>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-200 rounded-full transition-colors"

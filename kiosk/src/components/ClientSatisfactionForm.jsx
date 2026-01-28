@@ -4,16 +4,17 @@ import RatingHeader from './RatingHeader';
 import VirtualKeyboard from './VirtualKeyboard';
 
 const ClientSatisfactionForm = () => {
-  // State to handle form data
+  // State to handle form data - MUST match backend schema exactly
   const [formData, setFormData] = useState({
+    office: '',
     client_type: '',
-    place: '',
     gender: '',
     age: '',
-    office: '',
-    service_date: new Date().toISOString().split('T')[0],
+    place: '',
+    religion: '',
     service_type: '',
     employee_name: '',
+    service_date: new Date().toISOString().split('T')[0],
 
     cc1: '',
     cc2: '',
@@ -60,6 +61,7 @@ const ClientSatisfactionForm = () => {
       }
     }, 100);
   };
+  
   const handleKeyboardChange = (input) => {
     if (!activeInput) return;
 
@@ -75,7 +77,8 @@ const ClientSatisfactionForm = () => {
       setActiveInput(null);
     }
   };
-    const handleCloseKeyboard = () => {
+  
+  const handleCloseKeyboard = () => {
     setShowKeyboard(false);
     setActiveInput(null);
   };
@@ -109,35 +112,65 @@ const ClientSatisfactionForm = () => {
       submitButton.textContent = 'Submitting...';
       submitButton.disabled = true;
 
+      // Prepare data - ensure all numeric fields are properly formatted
+      const submitData = {
+        ...formData,
+        // Ensure numeric fields are numbers or empty strings
+        age: formData.age ? parseInt(formData.age) : '',
+        cc1: formData.cc1 ? parseInt(formData.cc1) : '',
+        cc2: formData.cc2 ? parseInt(formData.cc2) : '',
+        cc3: formData.cc3 ? parseInt(formData.cc3) : '',
+        responsiveness: formData.responsiveness === 'NA' ? 'NA' : (formData.responsiveness ? parseInt(formData.responsiveness) : ''),
+        reliability: formData.reliability === 'NA' ? 'NA' : (formData.reliability ? parseInt(formData.reliability) : ''),
+        facilities: formData.facilities === 'NA' ? 'NA' : (formData.facilities ? parseInt(formData.facilities) : ''),
+        communication: formData.communication === 'NA' ? 'NA' : (formData.communication ? parseInt(formData.communication) : ''),
+        costs: formData.costs === 'NA' ? 'NA' : (formData.costs ? parseInt(formData.costs) : ''),
+        integrity: formData.integrity === 'NA' ? 'NA' : (formData.integrity ? parseInt(formData.integrity) : ''),
+        assurance: formData.assurance === 'NA' ? 'NA' : (formData.assurance ? parseInt(formData.assurance) : ''),
+        outcome: formData.outcome === 'NA' ? 'NA' : (formData.outcome ? parseInt(formData.outcome) : ''),
+      };
+
+      console.log('Submitting data:', submitData);
+
       // Send data to backend
       const response = await fetch('http://127.0.0.1:5000/api/get-survey-client', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      console.log('Response status:', response.status);
+
+      // Handle successful response
+      let result = null;
+      try {
+        result = await response.json();
+        console.log('Server response:', result);
+      } catch (jsonError) {
+        // If response body is empty or not JSON, that's okay for 201
+        console.log('No JSON response body (this is okay for 201 status)');
       }
 
-      const result = await response.json();
-      console.log('Server response:', result);
+      if (!response.ok) {
+        throw new Error(result?.message || `HTTP error! status: ${response.status}`);
+      }
       
-      alert("Form submitted successfully!");
+      // Show success message
+      alert("Matagumpay na naisumite ang form! (Form submitted successfully!)");
       
       // Reset form after successful submission
       setFormData({
+        office: '',
         client_type: '',
-        place: '',
         gender: '',
         age: '',
-        office: '',
-        service_date: new Date().toISOString().split('T')[0],
+        place: '',
+        religion: '',
         service_type: '',
         employee_name: '',
+        service_date: new Date().toISOString().split('T')[0],
         cc1: '',
         cc2: '',
         cc3: '',
@@ -263,6 +296,22 @@ const ClientSatisfactionForm = () => {
             />
           </div>
         </div>
+
+        {/* --- Religion Field (added to match backend) --- */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 border border-gray-300 p-3 rounded">
+          <div className="flex flex-col">
+            <label className="font-bold text-xs uppercase mb-1">Relihiyon (Religion):</label>
+            <input 
+              type="text" 
+              name="religion" 
+              value={formData.religion}
+              onFocus={handleFocus}
+              onChange={handleChange}
+              className="border border-gray-400 p-1 w-full"
+              placeholder="e.g., Catholic, Protestant, Islam, etc."
+            />
+          </div>
+        </div> */}
 
         {/* --- Service Details --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-gray-300 p-3 mb-6 rounded">
@@ -500,8 +549,8 @@ const ClientSatisfactionForm = () => {
         />
       )}
 
-            </div>
-        );
-        };
+    </div>
+  );
+};
 
 export default ClientSatisfactionForm;
