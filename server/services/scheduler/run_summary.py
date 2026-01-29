@@ -13,12 +13,12 @@ def start_scheduler():
 
 def run_daily_summary():
     today = date.today()
-    
     generate_period_summary(
         period_type="daily",
         start_date=today,
         end_date=today
     )
+    get_service_performance()
 
 
 def run_weekly_summary():
@@ -41,7 +41,6 @@ def run_monthly_summary():
         start_date=start_date,
         end_date=today
     )
-    get_service_performance()
    
 
 

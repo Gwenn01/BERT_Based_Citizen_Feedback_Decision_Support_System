@@ -121,16 +121,51 @@ LABEL_MAP = {
     1: "Neutral",
     2: "Positive"
 }
+#tagalog normalization
+TAGALOG_NORMALIZATION_MAP = {
+    # Negations
+    "hinde": "hindi",
+    "nde": "hindi",
+    "di": "hindi",
 
+    # Common contractions / slang
+    "kase": "kasi",
+    "kc": "kasi",
+    "lang": "lamang",
+    "lng": "lamang",
+
+    # Service-related terms
+    "pakikitungo": "pakikitungo",  # keep consistent
+    "ugali": "ugali",
+
+    # Emphasis words (optional)
+    "sobrang": "napaka",
+    "super": "napaka",
+
+    # Informal fillers (optional)
+    "po": "po",
+    "opo": "po"
+}
 # =====================================================
 # LIGHT NORMALIZATION (SAFE)
 # =====================================================
+
 def normalize_text(text: str) -> str:
     text = text.lower()
     text = re.sub(r"http\S+", "", text)
     text = re.sub(r"[^a-zñ\s]", " ", text)
+
+    # normalize spacing
     text = re.sub(r"\s+", " ", text).strip()
-    return text
+
+    # Tagalog normalization
+    words = text.split()
+    normalized_words = [
+        TAGALOG_NORMALIZATION_MAP.get(word, word)
+        for word in words
+    ]
+
+    return " ".join(normalized_words)
 
 # =====================================================
 # RULE-BASED SENTIMENT HINTS (TAGALOG / TAGLISH)
@@ -158,6 +193,15 @@ NEGATIVE_HINTS = [
 
     # Bureaucratic burden
     "ang dami ng requirements"
+    #adtional
+    "masungit",
+    "suplado",
+    "bastos",
+    "hindi maayos ang pakikitungo",
+    "pangit ang pakikitungo",
+    "masama ang ugali",
+    "walang galang",
+    "hindi magalang"
 ]
 
 
@@ -183,6 +227,29 @@ POSITIVE_HINTS = [
     "satisfied",
     "malinaw ang proseso"
 ]
+
+NEUTRAL_HINTS = [
+    # Explicit neutrality
+    "no comments",
+    "no comment",
+    "wala naman akong reklamo",
+    "walang reklamo",
+    "wala akong reklamo",
+    "walang complaint",
+    "wala namang reklamo",
+
+    # Indifference / nothing to add
+    "wala lang",
+    "okay lang",
+    "sakto lang",
+    "pwede na",
+
+    # English/Taglish
+    "nothing to say",
+    "no issues",
+    "no problem"
+]
+
 
 
 # =====================================================
@@ -221,22 +288,36 @@ def predict_sentiment(text: str):
     # -----------------------------
     text_lower = clean_text
 
-    if label == "Positive" and any(w in text_lower for w in NEGATIVE_HINTS):
+    has_negative = any(w in text_lower for w in NEGATIVE_HINTS)
+    has_positive = any(w in text_lower for w in POSITIVE_HINTS)
+    has_neutral  = any(w in text_lower for w in NEUTRAL_HINTS)
+
+    # 1️ Explicit neutrality (no praise, no complaint)
+    if has_neutral and not has_negative and not has_positive:
+        label = "Neutral"
+        confidence = max(confidence, 0.80)
+
+    # 2️ Override BERT if it contradicts strong hints
+    elif label == "Positive" and has_negative:
         label = "Negative"
         confidence *= 0.85
 
-    elif label == "Negative" and any(w in text_lower for w in POSITIVE_HINTS):
+    elif label == "Negative" and has_positive:
         label = "Positive"
         confidence *= 0.85
 
-    # -----------------------------
-    # CONFIDENCE SAFETY NET
-    # -----------------------------
+    # 3️ Low-confidence safety net (SMART version)
     if confidence < 0.75:
-        label = "Neutral"
+        if has_negative:
+            label = "Negative"
+        elif has_positive:
+            label = "Positive"
+        else:
+            label = "Neutral"
 
     return {
         "label": label,
         "confidence": round(confidence, 4)
     }
+
 
