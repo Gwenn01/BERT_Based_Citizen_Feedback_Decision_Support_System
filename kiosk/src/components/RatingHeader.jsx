@@ -16,13 +16,13 @@ const RatingHeader = ({ emoji, score, label, color }) => (
 
     {/* 2. Image and Score Container */}
     <div className="flex flex-col items-center justify-center gap-2">
-      <img 
+      {/* <img 
           src={emoji} 
           alt={label} 
           className="w-10 h-10 md:w-14 md:h-14 object-contain" 
-      />
+      /> */}
       {/* Applied the color prop here if you want the number colored */}
-      <span className={`font-bold text-sm `}>
+      <span className={`font-bold text-base `}>
         {score}
       </span>
     </div>

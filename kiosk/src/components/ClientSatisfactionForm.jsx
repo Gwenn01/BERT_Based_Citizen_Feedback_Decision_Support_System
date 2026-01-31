@@ -38,6 +38,8 @@ const ClientSatisfactionForm = () => {
   const [activeInput, setActiveInput] = useState(null);
   const formRef = useRef(null);
   const activeInputRef = useRef(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
   const handleFocus = (e) => {
     setActiveInput(e.target.name);
@@ -157,8 +159,15 @@ const ClientSatisfactionForm = () => {
         throw new Error(result?.message || `HTTP error! status: ${response.status}`);
       }
       
-      // Show success message
-      alert("Matagumpay na naisumite ang form! (Form submitted successfully!)");
+
+      // Show success modal
+      setShowSuccessModal(true);
+
+      // Auto close modal after 5 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 2500);
+
       
       // Reset form after successful submission
       setFormData({
@@ -204,13 +213,22 @@ const ClientSatisfactionForm = () => {
     }
   };
 
+  // Emoji mapping for ratings
+  const emojiMap = {
+    5: five,
+    4: four,
+    3: three,
+    2: two,
+    1: one
+  };
+
   return (
     <div 
       ref={formRef}
-      className="min-h-screen bg-gray-100 py-8 px-4 font-sans text-sm text-gray-800"
+      className="min-h-screen mb-4 bg-gray-100 py-4 px-4 font-sans text-sm text-gray-800"
       style={{ paddingBottom: showKeyboard ? '350px' : '0' }}
     >
-      <form onSubmit={handleSubmit} className="max-w-5xl mx-auto bg-white border border-gray-300 shadow-lg p-6 md:p-10">
+      <form onSubmit={handleSubmit} className="max-w-6xl mx-auto bg-white border border-gray-300 shadow-lg p-6 ">
         
         {/* --- Header --- */}
         <div className="flex items-center justify-center mb-6 text-center gap-4">
@@ -247,6 +265,7 @@ const ClientSatisfactionForm = () => {
                   checked={formData.client_type === type}
                   onChange={handleChange}
                   className="w-4 h-4"
+                  required
                 />
                 {type}
               </label>
@@ -265,6 +284,7 @@ const ClientSatisfactionForm = () => {
                 onFocus={handleFocus}
                 onChange={handleChange}
                 className='border-b border-black w-full'
+                required
                 />
           </div>
           
@@ -278,6 +298,7 @@ const ClientSatisfactionForm = () => {
                  value={g.value}
                  checked={formData.gender === g.value}
                  onChange={handleChange} 
+                 required
                />
                {g.label}
              </label>
@@ -293,31 +314,16 @@ const ClientSatisfactionForm = () => {
               value={formData.age}
               onFocus={handleFocus}
               onChange={handleChange} 
+              required
             />
           </div>
         </div>
-
-        {/* --- Religion Field (added to match backend) --- */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 border border-gray-300 p-3 rounded">
-          <div className="flex flex-col">
-            <label className="font-bold text-xs uppercase mb-1">Relihiyon (Religion):</label>
-            <input 
-              type="text" 
-              name="religion" 
-              value={formData.religion}
-              onFocus={handleFocus}
-              onChange={handleChange}
-              className="border border-gray-400 p-1 w-full"
-              placeholder="e.g., Catholic, Protestant, Islam, etc."
-            />
-          </div>
-        </div> */}
 
         {/* --- Service Details --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-gray-300 p-3 mb-6 rounded">
           <div className="flex flex-col">
             <label className="font-bold text-xs uppercase mb-1">Opisinang Pinuntahan:</label>
-            <select name="office" value={formData.office} onChange={handleChange} className="border border-gray-400 p-1 w-full">
+            <select required name="office" value={formData.office} onChange={handleChange} className="border border-gray-400 p-1 w-full">
               <option value="">Select Office...</option>
               <option value="Office of the Sangguniang Bayan">Office of the Sangguniang Bayan</option>
               <option value="Assessor's Office">Assessor's Office</option>
@@ -333,11 +339,11 @@ const ClientSatisfactionForm = () => {
           </div>
           <div className="flex flex-col">
              <label className="font-bold text-xs uppercase mb-1">Petsa:</label>
-             <input type="date" name="service_date" value={formData.service_date} onChange={handleChange} className="border border-gray-400 p-1 w-full"/>
+             <input required type="date" name="service_date" value={formData.service_date} onChange={handleChange} className="border border-gray-400 p-1 w-full"/>
           </div>
           <div className="flex flex-col">
              <label className="font-bold text-xs uppercase mb-1">Uri ng Serbisyo:</label>
-             <input type="text" name="service_type" value={formData.service_type} onChange={handleChange} onFocus={handleFocus} className="border border-gray-400 p-1 w-full"/>
+             <input required type="text" name="service_type" value={formData.service_type} onChange={handleChange} onFocus={handleFocus} className="border border-gray-400 p-1 w-full"/>
           </div>
           <div className="flex flex-col">
              <label className="font-bold text-xs uppercase mb-1">Pangalan ng Empleyado:</label>
@@ -374,6 +380,7 @@ const ClientSatisfactionForm = () => {
                         setFormData(prev => ({ ...prev, [name]: parseInt(value) }));
                       }}
                       className="mt-1" 
+                      
                     />
                     <span>{opt}</span>
                   </label>
@@ -384,7 +391,7 @@ const ClientSatisfactionForm = () => {
             {/* CC2 */}
             <div>
               <p className="font-bold mb-1">CC2. Kung ikaw ay may kamalayan sa Citizen's Charter (sagot sa 1-3 sa CC1), masasabi mo ba na ang CC ng opisinang ito ay...?</p>
-              <div className="flex flex-wrap gap-4 ml-4">
+              <div className="flex flex-col gap-1 ml-4">
                 {[
                   {label: "1. Madaling Makita", value: 1},
                   {label: "2. Medyo Nakikita", value: 2},
@@ -402,6 +409,7 @@ const ClientSatisfactionForm = () => {
                        const { name, value } = e.target;
                        setFormData(prev => ({ ...prev, [name]: parseInt(value) }));
                      }}
+                     
                    />
                    <span>{opt.label}</span>
                  </label>
@@ -430,6 +438,7 @@ const ClientSatisfactionForm = () => {
                        setFormData(prev => ({ ...prev, [name]: parseInt(value) }));
                      }}
                      className="mt-1" 
+                     
                    />
                    <span>{opt.label}</span>
                  </label>
@@ -447,14 +456,13 @@ const ClientSatisfactionForm = () => {
                 <tr className="border-b border-gray-300">
                   <th className="p-4 w-1/3 text-center align-middle">
                     <span className="font-bold block">SERBISYO</span>
-                    <span className="text-xs font-normal mt-2 block">Markahan ng tsek (✓) ang antas ng iyong kasiyahan sa serbisyong binigay sa iyo.</span>
+                    <span className="text-xs font-normal mt-2 block">Pindutin ang emoji para piliin ang antas ng iyong kasiyahan.</span>
                   </th>
-                  <th className="w-[10%]"><RatingHeader label="LUBOS NA NASIYAHAN" emoji={five} score="5" color="text-orange-500" /></th>
-                  <th className="w-[10%]"><RatingHeader label="NASIYAHAN" emoji={four} score="4" color="text-yellow-500" /></th>
-                  <th className="w-[10%]"><RatingHeader label="NI NASIYAHAN O HINDI" emoji={three} score="3" color="text-yellow-600" /></th>
-                  <th className="w-[10%]"><RatingHeader label="HINDI NASIYAHAN" emoji={two} score="2" color="text-orange-600" /></th>
-                  <th className="w-[10%]"><RatingHeader label="LUBOS NA HINDI NASIYAHAN" emoji={one} score="1" color="text-red-600" /></th>
-                  <th className="w-[5%] text-center font-bold text-xs p-2 align-middle">N/A <br/> Not Applicable</th>
+                  <th className="w-[10%]"><RatingHeader label="LUBOS NA NASIYAHAN" score="5" color="text-orange-500" /></th>
+                  <th className="w-[10%]"><RatingHeader label="NASIYAHAN" score="4" color="text-yellow-500" /></th>
+                  <th className="w-[10%]"><RatingHeader label="NI NASIYAHAN O HINDI" score="3" color="text-yellow-600" /></th>
+                  <th className="w-[10%]"><RatingHeader label="HINDI NASIYAHAN" score="2" color="text-orange-600" /></th>
+                  <th className="w-[10%]"><RatingHeader label="LUBOS NA HINDI NASIYAHAN" score="1" color="text-red-600" /></th>
                 </tr>
               </thead>
               <tbody className="text-xs md:text-sm">
@@ -470,18 +478,29 @@ const ClientSatisfactionForm = () => {
                 ].map((row, index) => (
                   <tr key={row.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="p-3 border-t border-gray-200">{row.text}</td>
-                    {[5, 4, 3, 2, 1, 'NA'].map((val) => (
-                      <td key={val} className="text-center border-t border-gray-200 border-l">
-                         <input 
-                           type="radio" 
-                           name={row.id} 
-                           value={val}
-                           checked={formData[row.id] == val}
-                           onChange={() => handleRatingChange(row.id, val)}
-                           className="w-4 h-4 cursor-pointer"
-                         />
+                    {[5, 4, 3, 2, 1].map((val) => (
+                      <td key={val} className="text-center border-t border-gray-200 border-l p-2">
+                        <button
+                          required
+                          type="button"
+                          onClick={() => handleRatingChange(row.id, val)}
+                          className={`w-12 h-12 md:w-14 md:h-14 transition-all duration-300 transform hover:scale-110 ${
+                            formData[row.id] == val 
+                              ? 'opacity-100 scale-110' 
+                              : formData[row.id] && formData[row.id] !== 'NA'
+                              ? 'opacity-20'
+                              : 'opacity-70 hover:opacity-80'
+                          }`}
+                        >
+                          <img 
+                            src={emojiMap[val]} 
+                            alt={`Rating ${val}`}
+                            className="w-full h-full object-contain"
+                          />
+                        </button>
                       </td>
                     ))}
+
                   </tr>
                 ))}
               </tbody>
@@ -498,6 +517,7 @@ const ClientSatisfactionForm = () => {
             onChange={handleChange}
             onFocus={handleFocus}
             className="w-full border border-gray-400 p-2 rounded"
+            required
           ></textarea>
         </div>
 
@@ -528,15 +548,30 @@ const ClientSatisfactionForm = () => {
            </div>
         </div>
 
+
         {/* --- Submit --- */}
-        <div className="flex justify-center">
-          <button 
-            type="submit" 
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded uppercase tracking-wider transition-colors"
+        <div className="flex justify-center py-5">
+          <button
+            type="submit"
+            className="
+              inline-flex items-center justify-center
+              rounded-lg
+              bg-blue-600
+              px-24 py-5
+              text-lg font-semibold uppercase tracking-wide
+              text-white
+              shadow-sm
+              transition-all
+              hover:bg-blue-700 hover:shadow-md
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+              active:scale-[0.98]
+              
+            "
           >
             Submit
           </button>
         </div>
+
 
       </form>
 
@@ -548,6 +583,43 @@ const ClientSatisfactionForm = () => {
           onClose={handleCloseKeyboard}
         />
       )}
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-fade-in">
+            
+            {/* Icon */}
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+              <svg
+                className="h-7 w-7 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-semibold text-gray-800">
+              Form Submitted
+            </h2>
+
+            {/* Message */}
+            <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+              Matagumpay na naisumite ang form.  
+              Thank you for your response.
+            </p>
+
+            {/* Footer note */}
+            <div className="mt-5 text-xs text-gray-500">
+              This window will close automatically in a few seconds.
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   );
