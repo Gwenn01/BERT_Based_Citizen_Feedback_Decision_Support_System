@@ -33,7 +33,8 @@ const FeedbackAnalysis = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const ITEMS_PER_LOAD = 4;
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -41,8 +42,8 @@ const FeedbackAnalysis = () => {
         const res = await fetch("http://127.0.0.1:5000/api/all-feedback");
         const json = await res.json();
 
-        // IMPORTANT: your API response has { feedback: [...] }
         setFeedbackData(json.feedback || []);
+        setVisibleCount(ITEMS_PER_LOAD);
       } catch (err) {
         console.error(err);
         setError("Failed to load feedback data");
@@ -63,7 +64,6 @@ const FeedbackAnalysis = () => {
     return "Neutral";
   };
 
-  // --- DYNAMIC DATA PROCESSING ---
   const stats = useMemo(() => {
     const data = feedbackData.map(item => ({
       ...item,
@@ -145,6 +145,8 @@ const FeedbackAnalysis = () => {
         };
         return parseTime(a.hour) - parseTime(b.hour);
       });
+
+      
 
     return {
       sentimentArr: [
@@ -260,6 +262,18 @@ if (error) {
     const sortedFeedback = [...filteredFeedback].sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
     });
+
+    const loadMoreProgressively = () => {
+      if (visibleCount >= sortedFeedback.length) return;
+      setLoadingMore(true);
+
+      setTimeout(() => {
+        setVisibleCount(prev =>
+          Math.min(prev + ITEMS_PER_LOAD, sortedFeedback.length)
+        );
+        setLoadingMore(false);
+      }, 800); 
+    };
 
     const visibleFeedbacks = sortedFeedback.slice(0, visibleCount);
 
@@ -784,10 +798,8 @@ if (error) {
             onScroll={(e) => {
               const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
-              if (scrollTop + clientHeight >= scrollHeight - 50) {
-                setVisibleCount((prev) =>
-                  Math.min(prev + 10, sortedFeedback.length)
-                );
+              if (scrollTop + clientHeight >= scrollHeight - 50 && !loadingMore) {
+                loadMoreProgressively();
               }
             }}
           >

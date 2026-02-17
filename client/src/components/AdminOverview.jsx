@@ -43,6 +43,7 @@ const getIcon = (name, size = 24) => {
   return icons[name] || <Activity size={size} />;
 };
 
+
 const KPICard = ({
   title,
   value,
@@ -63,7 +64,9 @@ const KPICard = ({
     amber: "bg-amber-50 text-amber-600 ring-amber-100",
   };
 
-  const isPositive = trend.includes("+") || ["Moderate", "Stable", "Improving", "Optimal"].includes(trend);
+  const safeTrend = trend ?? "";
+
+  const isPositive = safeTrend.includes("+") || ["Moderate", "Stable", "Improving", "Optimal"].includes(trend);
   const trendColor = isPositive ? "bg-green-100/50 text-green-700" : "bg-red-100/50 text-red-700";
 
   return (
