@@ -1,12 +1,13 @@
 from flask import request, jsonify
-from model.admin import insert_admin, get_admin
+from model.admin import get_admin, insert_admin
 import bcrypt
+
 
 def login_controller():
     try:
         data = request.get_json()
 
-        #  Validate request body
+        # Validate request body
         if not data:
             return jsonify({
                 "success": False,
@@ -31,10 +32,11 @@ def login_controller():
                 "message": "Invalid email or password"
             }), 401
 
-        #  Verify password
-        stored_hash = admin["password"]
+        #  FIX: Convert memoryview → bytes
+        stored_hash = bytes(admin["password"])
 
-        if not bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+        # Verify password
+        if not bcrypt.checkpw(password.encode("utf-8"), stored_hash):
             return jsonify({
                 "success": False,
                 "message": "Invalid email or password"

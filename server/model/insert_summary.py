@@ -1,48 +1,58 @@
 from database.connection import get_db_connection
+from database.db_utils import fetch_one
+
 
 def period_exists(period_type, start_date, end_date):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    try:
+        result = fetch_one("""
+            SELECT period_id
+            FROM survey_periods
+            WHERE period_name = %s
+              AND start_date = %s
+              AND end_date = %s
+        """, (period_type, start_date, end_date))
 
-    cursor.execute("""
-        SELECT period_id FROM survey_periods
-        WHERE period_name=%s AND start_date=%s AND end_date=%s
-    """, (period_type, start_date, end_date))
+        return result is not None
 
-    exists = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    return exists is not None
+    except Exception as e:
+        print("❌ period_exists error:", e)
+        return False
 
 
 def insert_summary(data):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    # if period_exists(
-    # data["period"]["type"],
-    #     data["period"]["start_date"],
-    #     data["period"]["end_date"]
-    # ):
-    #     return  # already exists, skip insertion
-
+    conn = None
+    cursor = None
 
     try:
-        # 1. Insert period
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        #  OPTIONAL: prevent duplicate
+        # if period_exists(
+        #     data["period"]["type"],
+        #     data["period"]["start_date"],
+        #     data["period"]["end_date"]
+        # ):
+        #     return None
+
+        # =========================
+        # 1. INSERT PERIOD (FIXED)
+        # =========================
         cursor.execute("""
             INSERT INTO survey_periods (period_name, start_date, end_date)
             VALUES (%s, %s, %s)
+            RETURNING period_id;
         """, (
             data["period"]["type"],
             data["period"]["start_date"],
             data["period"]["end_date"]
         ))
 
-        period_id = cursor.lastrowid
+        period_id = cursor.fetchone()[0]
 
-        # 2. Insert survey results
+        # =========================
+        # 2. SURVEY RESULTS
+        # =========================
         survey = data["survey"]
         averages = survey["averages"]
 
@@ -72,7 +82,9 @@ def insert_summary(data):
             averages["outcome"]
         ))
 
-        # 3. Insert sentiment results
+        # =========================
+        # 3. SENTIMENT RESULTS
+        # =========================
         sentiment = data["sentiment"]
 
         cursor.execute("""
@@ -101,7 +113,9 @@ def insert_summary(data):
             sentiment["average_confidence"]
         ))
 
-        # 4. Insert citizen charter awareness
+        # =========================
+        # 4. CITIZEN CHARTER
+        # =========================
         cc = data["awareness"]
 
         cursor.execute("""
@@ -119,17 +133,22 @@ def insert_summary(data):
             cc["cc2_awareness_percent"],
             cc["cc3_awareness_percent"],
             cc["overall_awareness"],
-            cc["status"].split()[0]  # Low / Moderate / High
+            cc["status"].split()[0]
         ))
 
+        #  COMMIT ALL
         conn.commit()
-    
+
         return period_id
 
     except Exception as e:
-        conn.rollback()
-        raise e
+        print("❌ insert_summary error:", e)
+        if conn:
+            conn.rollback()
+        return None
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

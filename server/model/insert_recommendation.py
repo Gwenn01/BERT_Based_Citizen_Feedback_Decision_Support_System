@@ -1,38 +1,41 @@
-from database.connection import get_db_connection
+from database.db_utils import execute_query
+
 
 def insert_recommendation(data):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    try:
+        query = """
+            INSERT INTO recommendations (
+                period_id,
+                category,
+                dimension,
+                severity,
+                issue,
+                root_cause,
+                impact,
+                recommendation_action,
+                evidence,
+                confidence_score
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
-    sql = """
-        INSERT INTO recommendations (
-            period_id,
-            category,
-            dimension,
-            severity,
-            issue,
-            root_cause,
-            impact,
-            recommendation_action,
-            evidence,
-            confidence_score
+        values = (
+            data["period_id"],
+            data["category"],
+            data["dimension"],
+            data["severity"],
+            data["issue"],
+            data["root_cause"],
+            data["impact"],
+            data["recommendation_action"],
+            data["evidence"],
+            data["confidence_score"]
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
 
-    cursor.execute(sql, (
-        data["period_id"],
-        data["category"],
-        data["dimension"],
-        data["severity"],
-        data["issue"],
-        data["root_cause"],
-        data["impact"],
-        data["recommendation_action"],
-        data["evidence"],
-        data["confidence_score"]
-    ))
+        execute_query(query, values)
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+        return True
+
+    except Exception as e:
+        print("❌ insert_recommendation error:", e)
+        return False
