@@ -7,7 +7,7 @@ def fetch_all(query, params=None):
     
     cursor.execute(query, params)
     result = cursor.fetchall()
-
+    conn.commit()  
     cursor.close()
     conn.close()
     return result
@@ -19,7 +19,7 @@ def fetch_one(query, params=None):
 
     cursor.execute(query, params)
     result = cursor.fetchone()
-
+    conn.commit()  
     cursor.close()
     conn.close()
     return result

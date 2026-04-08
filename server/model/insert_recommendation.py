@@ -3,6 +3,10 @@ from database.db_utils import execute_query
 
 def insert_recommendation(data):
     try:
+        if not data.get("period_id"):
+            print(" Skipping recommendation: period_id is None")
+            return False
+
         query = """
             INSERT INTO recommendations (
                 period_id,
@@ -25,14 +29,16 @@ def insert_recommendation(data):
             data["dimension"],
             data["severity"],
             data["issue"],
-            data["root_cause"],
-            data["impact"],
+            data.get("root_cause"),
+            data.get("impact"),
             data["recommendation_action"],
             data["evidence"],
             data["confidence_score"]
         )
 
         execute_query(query, values)
+
+        print(" Recommendation inserted:", data["category"], "-", data["dimension"])
 
         return True
 

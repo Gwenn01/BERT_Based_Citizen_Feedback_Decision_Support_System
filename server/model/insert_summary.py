@@ -1,22 +1,4 @@
 from database.connection import get_db_connection
-from database.db_utils import fetch_one
-
-
-def period_exists(period_type, start_date, end_date):
-    try:
-        result = fetch_one("""
-            SELECT period_id
-            FROM survey_periods
-            WHERE period_name = %s
-              AND start_date = %s
-              AND end_date = %s
-        """, (period_type, start_date, end_date))
-
-        return result is not None
-
-    except Exception as e:
-        print("❌ period_exists error:", e)
-        return False
 
 
 def insert_summary(data):
@@ -27,31 +9,35 @@ def insert_summary(data):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        #  OPTIONAL: prevent duplicate
-        # if period_exists(
-        #     data["period"]["type"],
-        #     data["period"]["start_date"],
-        #     data["period"]["end_date"]
-        # ):
-        #     return None
+        period_type = data["period"]["type"]
+        start_date = data["period"]["start_date"]
+        end_date = data["period"]["end_date"]
 
         # =========================
-        # 1. INSERT PERIOD (FIXED)
+        # 1. UPSERT PERIOD (FIXED)
         # =========================
         cursor.execute("""
             INSERT INTO survey_periods (period_name, start_date, end_date)
             VALUES (%s, %s, %s)
+            ON CONFLICT (period_name, start_date, end_date)
+            DO UPDATE SET period_name = EXCLUDED.period_name
             RETURNING period_id;
-        """, (
-            data["period"]["type"],
-            data["period"]["start_date"],
-            data["period"]["end_date"]
-        ))
+        """, (period_type, start_date, end_date))
 
         period_id = cursor.fetchone()[0]
 
+        if not period_id:
+            raise Exception("Failed to get period_id")
+
         # =========================
-        # 2. SURVEY RESULTS
+        # 2. CLEAN OLD DATA
+        # =========================
+        cursor.execute("DELETE FROM survey_results WHERE period_id = %s", (period_id,))
+        cursor.execute("DELETE FROM sentiment_results WHERE period_id = %s", (period_id,))
+        cursor.execute("DELETE FROM citizen_charter_awareness WHERE period_id = %s", (period_id,))
+
+        # =========================
+        # 3. SURVEY RESULTS
         # =========================
         survey = data["survey"]
         averages = survey["averages"]
@@ -83,7 +69,7 @@ def insert_summary(data):
         ))
 
         # =========================
-        # 3. SENTIMENT RESULTS
+        # 4. SENTIMENT RESULTS
         # =========================
         sentiment = data["sentiment"]
 
@@ -114,7 +100,7 @@ def insert_summary(data):
         ))
 
         # =========================
-        # 4. CITIZEN CHARTER
+        # 5. CITIZEN CHARTER AWARENESS
         # =========================
         cc = data["awareness"]
 
@@ -136,8 +122,12 @@ def insert_summary(data):
             cc["status"].split()[0]
         ))
 
-        #  COMMIT ALL
+        # =========================
+        # 6. COMMIT
+        # =========================
         conn.commit()
+
+        print(f" Summary saved for {period_type} ({start_date} → {end_date})")
 
         return period_id
 
