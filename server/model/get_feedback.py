@@ -1,86 +1,88 @@
-from database.connection import get_db_connection
+from database.db_utils import fetch_all, execute_query
 
 def get_feedback():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback")
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all("SELECT * FROM feedback")
+    except Exception as e:
+        print("Error in get_feedback:", e)
+        return []
+
 
 def get_monthly_feedback():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback WHERE service_date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all("""
+            SELECT * FROM feedback
+            WHERE service_date >= CURRENT_DATE - INTERVAL '1 month'
+        """)
+    except Exception as e:
+        print("Error in get_monthly_feedback:", e)
+        return []
+
 
 def get_weekly_feedback():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback WHERE service_date >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK)")
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all("""
+            SELECT * FROM feedback
+            WHERE service_date >= CURRENT_DATE - INTERVAL '1 week'
+        """)
+    except Exception as e:
+        print("Error in get_weekly_feedback:", e)
+        return []
+
 
 def get_daily_feedback():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback WHERE service_date >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all("""
+            SELECT * FROM feedback
+            WHERE service_date >= CURRENT_DATE - INTERVAL '1 day'
+        """)
+    except Exception as e:
+        print("Error in get_daily_feedback:", e)
+        return []
+
 
 def fetch_recent_feedback():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT *
-        FROM feedback
-        ORDER BY created_at DESC
-        LIMIT 5
-    """)
-
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all("""
+            SELECT *
+            FROM feedback
+            ORDER BY created_at DESC
+            LIMIT 5
+        """)
+    except Exception as e:
+        print("Error in fetch_recent_feedback:", e)
+        return []
 
 
 def fetch_feedback_by_service(service_id):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM feedback WHERE service_id = %s", (service_id,))
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all(
+            "SELECT * FROM feedback WHERE service_id = %s",
+            (service_id,)
+        )
+    except Exception as e:
+        print("Error in fetch_feedback_by_service:", e)
+        return []
+
 
 def fetch_negative_feedback_by_service(service_id):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT comment FROM feedback WHERE service_id = %s AND sentiment = 'negative'", (service_id,))
-    feedback = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return feedback
+    try:
+        return fetch_all(
+            "SELECT comment FROM feedback WHERE service_id = %s AND sentiment = 'negative'",
+            (service_id,)
+        )
+    except Exception as e:
+        print("Error in fetch_negative_feedback_by_service:", e)
+        return []
 
 
 def update_feedback_status(feedback_id, sentiment_label, confidence):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "UPDATE feedback SET sentiment = %s, confidence = %s WHERE feedback_id = %s",
-        (sentiment_label,confidence, feedback_id)
-    )
-
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        execute_query(
+            "UPDATE feedback SET sentiment = %s, confidence = %s WHERE feedback_id = %s",
+            (sentiment_label, confidence, feedback_id)
+        )
+        return True
+    except Exception as e:
+        print("Error in update_feedback_status:", e)
+        return False

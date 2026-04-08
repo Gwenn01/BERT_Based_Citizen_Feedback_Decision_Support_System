@@ -271,3 +271,286 @@ CREATE TABLE office_performance (
 
 show databases;
 DELETE FROM feedback WHERE feedback_id = 127;
+
+-- clean database =============================================================================================================
+-- =========================
+-- DATABASE
+-- =========================
+CREATE DATABASE IF NOT EXISTS citizen_feedback_db;
+USE citizen_feedback_db;
+
+-- =========================
+-- SERVICES
+-- =========================
+CREATE TABLE services (
+    service_id INT AUTO_INCREMENT PRIMARY KEY,
+    service_name VARCHAR(100),
+    description TEXT,
+    is_active BOOLEAN DEFAULT 1
+);
+
+-- =========================
+-- ADMIN
+-- =========================
+CREATE TABLE admin (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARBINARY(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================
+-- FEEDBACK
+-- =========================
+CREATE TABLE feedback (
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    service_id INT,
+
+    client_type ENUM('General Public', 'Government Employee', 'Business/Private'),
+    gender ENUM('Male', 'Female'),
+    age INT,
+
+    place VARCHAR(255),
+    religion VARCHAR(100),
+
+    service_type VARCHAR(100),
+    employee_name VARCHAR(100),
+
+    cc1 INT,
+    cc2 INT,
+    cc3 INT,
+
+    responsiveness INT,
+    reliability INT,
+    facilities INT,
+    communication INT,
+    costs INT,
+    integrity INT,
+    assurance INT,
+    outcome INT,
+
+    comment TEXT,
+
+    sentiment ENUM('positive', 'neutral', 'negative'),
+    confidence DECIMAL(5,4),
+
+    email VARCHAR(255),
+    phone_number VARCHAR(20),
+
+    service_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (service_id)
+        REFERENCES services(service_id)
+        ON DELETE CASCADE
+);
+
+-- =========================
+-- SURVEY PERIODS
+-- =========================
+CREATE TABLE survey_periods (
+    period_id INT AUTO_INCREMENT PRIMARY KEY,
+    period_name ENUM('daily', 'weekly', 'monthly') NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (period_name, start_date, end_date)
+);
+
+-- =========================
+-- SURVEY RESULTS
+-- =========================
+CREATE TABLE survey_results (
+    survey_result_id INT AUTO_INCREMENT PRIMARY KEY,
+    period_id INT NOT NULL,
+
+    overall_avg DECIMAL(5,2),
+    responsiveness_avg DECIMAL(5,2),
+    reliability_avg DECIMAL(5,2),
+    facilities_avg DECIMAL(5,2),
+    communication_avg DECIMAL(5,2),
+    cost_avg DECIMAL(5,2),
+    integrity_avg DECIMAL(5,2),
+    assurance_avg DECIMAL(5,2),
+    outcome_avg DECIMAL(5,2),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (period_id)
+        REFERENCES survey_periods(period_id)
+        ON DELETE CASCADE
+);
+
+-- =========================
+-- SENTIMENT RESULTS
+-- =========================
+CREATE TABLE sentiment_results (
+    sentiment_result_id INT AUTO_INCREMENT PRIMARY KEY,
+    period_id INT NOT NULL,
+
+    total_comments INT,
+    positive_count INT,
+    neutral_count INT,
+    negative_count INT,
+
+    positive_percent DECIMAL(5,2),
+    neutral_percent DECIMAL(5,2),
+    negative_percent DECIMAL(5,2),
+
+    sentiment_score DECIMAL(5,2),
+    average_confidence DECIMAL(5,4),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (period_id)
+        REFERENCES survey_periods(period_id)
+        ON DELETE CASCADE
+);
+
+-- =========================
+-- CITIZEN CHARTER AWARENESS
+-- =========================
+CREATE TABLE citizen_charter_awareness (
+    awareness_id INT AUTO_INCREMENT PRIMARY KEY,
+    period_id INT NOT NULL,
+
+    cc1_awareness_percent DECIMAL(5,2),
+    cc2_awareness_percent DECIMAL(5,2),
+    cc3_awareness_percent DECIMAL(5,2),
+
+    overall_awareness DECIMAL(5,2),
+    status ENUM('Low', 'Moderate', 'High'),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (period_id)
+        REFERENCES survey_periods(period_id)
+        ON DELETE CASCADE
+);
+
+-- =========================
+-- RECOMMENDATIONS
+-- =========================
+CREATE TABLE recommendations (
+    recommendation_id INT AUTO_INCREMENT PRIMARY KEY,
+    period_id INT NOT NULL,
+
+    category VARCHAR(100),
+    dimension VARCHAR(100),
+    severity ENUM('Low', 'Medium', 'High', 'Critical'),
+
+    issue TEXT,
+    root_cause TEXT,
+    impact TEXT,
+    recommendation_action TEXT,
+    evidence TEXT,
+
+    confidence_score DECIMAL(5,4),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (period_id)
+        REFERENCES survey_periods(period_id)
+        ON DELETE CASCADE
+);
+
+-- =========================
+-- OFFICE PERFORMANCE
+-- =========================
+CREATE TABLE office_performance (
+    office_id INT AUTO_INCREMENT PRIMARY KEY,
+    office_name VARCHAR(255) NOT NULL UNIQUE,
+
+    citizens_charter_awareness DECIMAL(5,2) NOT NULL,
+    survey_analysis DECIMAL(5,2) NOT NULL,
+    sentiment_analysis DECIMAL(5,2) NOT NULL,
+
+    total_feedback_count INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- =========================
+-- INSERT DATA
+-- =========================
+
+-- SERVICES
+INSERT INTO services (service_name, description) VALUES
+('Business Permit Licensing', 'Issuance of business permits'),
+('City Health Office', 'Medical and health services'),
+('Civil Registry', 'Birth, death, and marriage certificates'),
+('City Engineering', 'Building permits and zoning'),
+('Social Welfare (DSWD)', 'Aid and counseling services');
+
+-- ADMIN (test only)
+INSERT INTO admin (full_name, email, password)
+VALUES ('Admin User', 'admin@gmail.com', 'test123');
+
+-- FEEDBACK
+INSERT INTO feedback (
+    service_id, client_type, gender, age, place, religion,
+    service_type, employee_name,
+    cc1, cc2, cc3,
+    responsiveness, reliability, facilities, communication,
+    costs, integrity, assurance, outcome,
+    comment, sentiment, confidence,
+    email, phone_number, service_date
+) VALUES
+(1, 'General Public', 'Male', 30, 'Olongapo', 'Catholic',
+ 'Application', 'Maria Santos',
+ 1,1,1,
+ 5,5,4,5,5,5,5,5,
+ 'Very fast service', 'positive', 0.95,
+ 'user1@gmail.com', '09123456789', CURDATE());
+
+-- PERIOD
+INSERT INTO survey_periods (period_name, start_date, end_date)
+VALUES ('weekly', '2026-04-01', '2026-04-07');
+
+-- SURVEY RESULTS
+INSERT INTO survey_results (
+    period_id, overall_avg,
+    responsiveness_avg, reliability_avg, facilities_avg,
+    communication_avg, cost_avg, integrity_avg,
+    assurance_avg, outcome_avg
+) VALUES
+(1, 4.20, 4.5,4.2,4.0,4.3,4.1,4.4,4.2,4.3);
+
+-- SENTIMENT RESULTS
+INSERT INTO sentiment_results (
+    period_id, total_comments,
+    positive_count, neutral_count, negative_count,
+    positive_percent, neutral_percent, negative_percent,
+    sentiment_score, average_confidence
+) VALUES
+(1, 50, 30,15,5, 60,30,10, 0.75, 0.85);
+
+-- AWARENESS
+INSERT INTO citizen_charter_awareness (
+    period_id,
+    cc1_awareness_percent, cc2_awareness_percent, cc3_awareness_percent,
+    overall_awareness, status
+) VALUES
+(1, 70,65,60, 65, 'Moderate');
+
+-- RECOMMENDATIONS
+INSERT INTO recommendations (
+    period_id, category, dimension, severity,
+    issue, root_cause, impact, recommendation_action,
+    evidence, confidence_score
+) VALUES
+(1, 'Service Quality', 'Responsiveness', 'High',
+ 'Slow response', 'Lack of staff', 'User dissatisfaction',
+ 'Hire more staff', 'Multiple complaints', 0.92);
+
+-- OFFICE PERFORMANCE
+INSERT INTO office_performance (
+    office_name,
+    citizens_charter_awareness,
+    survey_analysis,
+    sentiment_analysis,
+    total_feedback_count
+) VALUES
+('City Health Office', 65.00, 4.20, 0.75, 50);

@@ -1,37 +1,37 @@
-from database.connection import get_db_connection
+from database.db_utils import fetch_one, execute_query
 import bcrypt
 
+
 def insert_admin(fullname, email, password):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    try:
+        # Hash password
+        hashed_password = bcrypt.hashpw(
+            password.encode('utf-8'),
+            bcrypt.gensalt()
+        )
 
-    #  Hash the password
-    hashed_password = bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt()
-    )
+        query = """
+            INSERT INTO admin (full_name, email, password)
+            VALUES (%s, %s, %s)
+        """
 
-    query = """
-        INSERT INTO admin (full_name, email, password)
-        VALUES (%s, %s, %s);
-    """
+        execute_query(query, (fullname, email, hashed_password))
+        return True
 
-    cursor.execute(query, (fullname, email, hashed_password))
-    conn.commit()
-    conn.close()
+    except Exception as e:
+        print("Error in insert_admin:", e)
+        return False
 
-    return True
 
 def get_admin(email):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT * FROM admin WHERE email = %s
+        """
 
-    query = """
-        SELECT * FROM admin WHERE email = %s;
-    """
+        result = fetch_one(query, (email,))
+        return result
 
-    cursor.execute(query, (email,))
-    result = cursor.fetchone()
-    conn.close()
-
-    return result
+    except Exception as e:
+        print("Error in get_admin:", e)
+        return None

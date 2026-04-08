@@ -1,22 +1,16 @@
-from database.connection import get_db_connection
+from database.db_utils import fetch_all
+
 
 def get_all_office_performance():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = """
-       SELECT op.*
-        FROM office_performance op
-        JOIN (
-            SELECT office_id,
-                MAX(DATE_FORMAT(created_at, '%Y%m')) AS latest_period
+    try:
+        query = """
+            SELECT DISTINCT ON (office_id) *
             FROM office_performance
-            GROUP BY office_id
-        ) latest
-        ON op.office_id = latest.office_id
-        AND DATE_FORMAT(op.created_at, '%Y%m') = latest.latest_period;
-    """
-    cursor.execute(query)
-    office_performance = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return office_performance
+            ORDER BY office_id, created_at DESC
+        """
+
+        return fetch_all(query)
+
+    except Exception as e:
+        print("❌ GET OFFICE PERFORMANCE ERROR:", e)
+        return []

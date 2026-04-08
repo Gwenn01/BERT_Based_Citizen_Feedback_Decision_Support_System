@@ -1,42 +1,50 @@
-from database.connection import get_db_connection
+from database.db_utils import fetch_all
+
 
 def get_recommendations(period_name):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT 
+                sp.period_id,
+                sp.period_name,
+                sp.start_date,
+                sp.end_date,
 
-    query = """
-        SELECT 
-            sp.period_id,
-            sp.period_name,
-            sp.start_date,
-            sp.end_date,
+                r.category,
+                r.dimension,
+                r.severity,
+                r.issue,
+                r.root_cause,
+                r.impact,
+                r.recommendation_action,
+                r.evidence,
+                r.confidence_score
 
-            r.category,
-            r.dimension,
-            r.severity,
-            r.issue,
-            r.root_cause,
-            r.impact,
-            r.recommendation_action,
-            r.evidence,
-            r.confidence_score
-        FROM survey_periods sp
-        LEFT JOIN recommendations r 
-            ON sp.period_id = r.period_id
-        WHERE sp.period_id = (
-            SELECT period_id
-            FROM survey_periods
-            WHERE period_name = %s
-            ORDER BY created_at DESC
-            LIMIT 1
-        )
-        ORDER BY r.severity DESC
-    """
+            FROM survey_periods sp
 
-    cursor.execute(query, (period_name,))
-    recommendations = cursor.fetchall()
+            LEFT JOIN recommendations r 
+                ON sp.period_id = r.period_id
 
-    cursor.close()
-    conn.close()
+            WHERE sp.period_id = (
+                SELECT period_id
+                FROM survey_periods
+                WHERE period_name = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            )
 
-    return recommendations
+            ORDER BY 
+                CASE r.severity
+                    WHEN 'Critical' THEN 4
+                    WHEN 'High' THEN 3
+                    WHEN 'Medium' THEN 2
+                    WHEN 'Low' THEN 1
+                    ELSE 0
+                END DESC
+        """
+
+        return fetch_all(query, (period_name,))
+
+    except Exception as e:
+        print("❌ GET RECOMMENDATIONS ERROR:", e)
+        return []
